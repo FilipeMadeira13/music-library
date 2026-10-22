@@ -1,6 +1,6 @@
 # Music Library — Proposta de arquitetura
 
-**Status:** proposta para aprovação; não autoriza implementação, criação de contas, contratação ou deploy.
+**Status:** estrutura geral e cinco decisões de controle e viabilidade aprovadas pelo proprietário na B01; fornecedores e detalhes não avaliados continuam propostos. Não autoriza implementação, criação de contas, contratação ou deploy.
 **Data:** 22/10/2026.
 **Base:** [PROJECT_SCOPE.md](PROJECT_SCOPE.md) e [REQUIREMENTS.md](REQUIREMENTS.md). Os requisitos detalhados e os esclarecimentos aprovados prevalecem sobre simplificações do escopo, como a obrigatoriedade do ano original.
 
@@ -10,7 +10,9 @@ Construir uma aplicação web com **Python, Django, páginas HTML renderizadas n
 
 A coleção ficará no servidor e será consultada pelos dois dispositivos. Recomenda-se login Google por OpenID Connect, integrado por django-allauth, e MusicBrainz como catálogo externo candidato. Serviços de streaming serão somente nomes e links mantidos pelo proprietário; não haverá integração com suas contas.
 
-As tecnologias abaixo são recomendações, não escolhas já aprovadas pelo proprietário. A documentação oficial foi consultada; não houve instalação, chamadas de teste às APIs de catálogo/identidade, criação de infraestrutura, teste de aplicação ou medição. A pasta atual contém os dois documentos de entrada e não é um repositório Git. A árvore da seção 3 é uma proposta futura, não uma estrutura já criada.
+O proprietário aprovou na revisão da B01 a estrutura geral: monólito Django com responsabilidades internas separadas, páginas renderizadas no servidor e PostgreSQL compartilhado entre os dispositivos. Também aprovou as cinco decisões registradas na seção 13. Essa aprovação não se estende automaticamente às demais bibliotecas, versões, fornecedores ou mecanismos propostos abaixo.
+
+Na elaboração original desta proposta, houve consulta à documentação oficial, sem instalação, testes de aplicação ou validação de serviços externos. Na revisão atual, foi constatado que o projeto já possui repositório Git, estrutura inicial Django, dependências fixadas, configuração de PostgreSQL, arquivo de teste de isolamento do banco e workflow de CI. A existência desses arquivos não comprova execução bem-sucedida. A árvore da seção 3 continua sendo a estrutura pretendida; não representa integralmente os arquivos existentes.
 
 **Conclusão de viabilidade:** o desenho funcional é adequado ao uso pessoal. Orçamento zero, desempenho após inatividade e proteção recuperável com perda máxima de 24 horas ainda exigem provas operacionais. A proposta não considera P08, P10, P12 e P13 encerradas apenas por indicar fornecedores.
 
@@ -366,7 +368,7 @@ Em `docs/operations/acceptance.md`, manter cada CA com tipo de teste, cenário, 
 
 ## 12. Decisões arquiteturais e alternativas rejeitadas
 
-ADR é um registro curto de decisão: motivo, consequência e quando reconsiderar. Todos os registros abaixo têm status **proposto**.
+ADR é um registro curto de decisão: motivo, consequência e quando reconsiderar. A estrutura geral descrita nos registros 01–03 foi **aprovada** pelo proprietário na revisão da B01: monólito Django, HTML no servidor com JavaScript pontual e PostgreSQL compartilhado. O mecanismo de revisão global, transação e recibo por UUID do registro 07 também foi **aprovado**. Os registros 05 e 10 têm aprovação limitada às regras de identidade prévia e validação da infraestrutura gratuita descritas na seção 13; os fornecedores não foram escolhidos. Os demais registros continuam **propostos**. Aprovação de desenho não comprova implementação ou funcionamento.
 
 | ADR | Decisão e motivo | Alternativa rejeitada nesta etapa | Consequência, custo de mudança e revisão |
 |---|---|---|---|
@@ -386,19 +388,35 @@ Não adicionar Docker obrigatório ao produto, sistema de plugins, múltiplas bi
 
 ## 13. Pendências, aprovação e próximos limites
 
+### Decisões aprovadas na B01
+
+Em 22/10/2026, o proprietário aprovou explicitamente, além da estrutura geral, as seguintes decisões:
+
+| Decisão | Alcance da aprovação e consequência |
+|---|---|
+| Revisão global da coleção | Comparar a revisão recebida com a atual e realizar a gravação sob transação e bloqueio curto. Uma tentativa desatualizada recebe conflito, preservando seus valores e apresentando os dados atuais. Aceita-se que mudanças independentes também provoquem conflitos; reconsiderar revisão por entidade se isso se tornar frequente no uso real |
+| Identificador de operação e repetição segura | Usar UUID por intenção de gravação e persistir a alteração e seu comprovante na mesma transação. Em resposta perdida, consultar a operação; uma repetição usa o mesmo UUID e os mesmos dados, sem duplicar o efeito. Isso não determina equivalência entre álbuns |
+| Geração operacional após restauração | Trocar a geração após restaurar o banco, antes de liberar acesso. Recusar formulários de gerações anteriores, mesmo quando seus comprovantes não existirem no backup, exigindo carregar os dados novamente |
+| Identidade previamente autorizada | Vincular previamente a identidade verificada do proprietário e recusar outras contas sem criar usuário ou sessão. Não conceder propriedade ao primeiro login; manter cadastro público e senha alternativa da aplicação desabilitados. Recuperação da conta pelo provedor; escolha e procedimento de verificação permanecem para B04 |
+| Infraestrutura gratuita condicionada à validação | Tratar hospedagem, banco e automação como candidatos. Avaliar retomada após inatividade, cotas e recuperação; não aceitar cobrança automática nem reduzir as metas aprovadas. Se a solução gratuita não atender aos requisitos, apresentar a limitação ao proprietário antes do uso definitivo |
+
+Essas aprovações são decisões de arquitetura. Não comprovam concorrência, integração de identidade, desempenho ou recuperação e não autorizam configurar serviços externos.
+
 | Pendência dos requisitos | O que esta proposta define | Evidência/decisão ainda necessária |
 |---|---|---|
 | P08 — catálogo | MusicBrainz, mapeamento e isolamento por adaptador | Cobertura real, dados dos anos, paginação, licença aplicável e respeito aos limites em ambiente compartilhado |
-| P09 — concorrência | Revisão global, bloqueio transacional, recibos e reconciliação | Aprovar mecanismo e demonstrar corridas/perda de resposta; validar o ponto de consistência do sorteio |
-| P10 — acesso | Google/allauth, identidade prévia, sessão absoluta e saída local | Aprovar política, definir procedimento seguro de obtenção do `sub`, validar configuração gratuita, rotas e controles reais |
+| P09 — concorrência | Revisão global, bloqueio transacional, recibos e reconciliação aprovados | Demonstrar corridas/perda de resposta; revisar e validar o ponto de consistência do sorteio |
+| P10 — acesso | Regra de identidade prévia aprovada; Google/allauth candidatos, sessão absoluta e saída local propostas | Definir procedimento seguro de obtenção da identidade, aprovar política de registros e validar provedor, configuração gratuita, rotas e controles reais na B04 e nas tarefas de implementação |
 | P11 — interface | HTML responsivo e testes de teclado/campos | Execução futura nos dispositivos e registro de versões; nenhuma compatibilidade presumida |
 | P12 — capacidade | Paginação, medições crescentes e protocolo aprovado preservado | Tempos reais, retomada após inatividade, cotas e volume; sem capacidade máxima prometida |
 | P13 — recuperação | Dump consistente, criptografia, retenção e restauração orientada | Provar acesso restrito, sete dias e ponto recuperável de até 24 horas; agendamento gratuito não garante a meta |
 
-Antes de implementar, o proprietário deve aprovar ou revisar esta arquitetura, especialmente os conflitos globais, a autorização prévia de identidade e as limitações da infraestrutura gratuita. As provas externas e configuração de serviços dependem de etapa autorizada; este documento não as executa.
+As decisões acima registram o alcance da aprovação do proprietário. Bibliotecas, fornecedores e detalhes técnicos ainda propostos precisam de avaliação e decisão antes de seu uso. As provas externas e configuração de serviços dependem de etapa autorizada; este documento não as executa.
 
 Após aprovação, a primeira microtarefa sugerida é definir um teste pequeno das validações de anos e explicar por que elas precisam existir também no comando que grava. O proprietário continua autor de testes e implementação. Preparação de Git/ambiente, instalação, configuração de serviços, migrações e deploy exigem suas respectivas autorizações e não estão incluídos na gravação deste documento.
 
 **Revisão ativa:** explique por que um UUID evita duplicar uma solicitação, mas não decide se dois álbuns são edições equivalentes; e por que uma rotina diária de backup não comprova perda máxima de 24 horas.
 
-**Evidência desta etapa:** documentos locais lidos, ausência de repositório Git verificada e documentação pública consultada. Foi criado apenas este documento de arquitetura. Nenhum código foi implementado, pacote instalado, serviço configurado ou teste de aplicação executado. A proposta aguarda aprovação.
+**Evidência da elaboração original:** documentos locais e documentação pública consultados, com produção desta proposta sem implementação ou validação de fornecedores naquela etapa.
+
+**Evidência da revisão da B01:** repositório Git e arquivos da preparação inicial conferidos; branch de trabalho `docs/b01-revisao-arquitetura`. A estrutura geral e as cinco decisões acima foram aprovadas explicitamente pelo proprietário, que autorizou seu registro documental. A revisão ativa sobre UUID foi realizada, e o proprietário autorizou o fechamento da B01 em 22/10/2026. As validações técnicas futuras continuam pendentes. Nesta revisão documental, não foram executados testes de aplicação, instalações, integrações externas ou deploy.
