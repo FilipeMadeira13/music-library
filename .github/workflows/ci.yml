@@ -1,0 +1,71 @@
+name: CI
+
+"on":
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Qualidade e testes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: music_library_dev
+          POSTGRES_USER: music_library_dev
+          # Credencial exclusiva do banco descartável desta execução.
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U music_library_dev -d music_library_dev"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Chave pública de teste, exclusiva do ambiente descartável.
+      DJANGO_SECRET_KEY: ci-only-key-never-use-outside-tests
+      DB_NAME: music_library_dev
+      DB_USER: music_library_dev
+      DB_PASSWORD: ci-only-password
+      DB_HOST: localhost
+      DB_PORT: "5432"
+
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Preparar Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependências de desenvolvimento
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Verificar dependências
+        run: python -m pip check
+
+      - name: Verificar lint
+        run: python -m ruff check --no-cache .
+
+      - name: Verificar formatação
+        run: python -m ruff format --check --no-cache .
+
+      - name: Verificar configuração Django
+        run: python manage.py check --database default
+
+      - name: Verificar alterações de modelos sem migração
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Executar testes com PostgreSQL
+        run: python manage.py test --noinput --verbosity 2
