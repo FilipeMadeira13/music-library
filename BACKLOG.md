@@ -1,7 +1,8 @@
 # Music Library — Backlog priorizado
 
 **Data:** 22/10/2026.  
-**Status:** planejamento para revisão; nenhuma tarefa de implementação iniciada.  
+**Status:** B01 concluída em 22/10/2026, com decisões registradas e revisão ativa realizada. Preparação técnica inicial já presente, sem aceite automático dos critérios de B06/B07.
+
 **Fontes:** [PROJECT_SCOPE.md](PROJECT_SCOPE.md), [REQUIREMENTS.md](REQUIREMENTS.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## 1. Premissas e limites
@@ -9,8 +10,8 @@
 - Os requisitos detalhados e os esclarecimentos aprovados prevalecem sobre simplificações do escopo.
 - Ano original é obrigatório; ano da versão é opcional. Trocar a versão preserva os links.
 - Backups e restauração técnica são condições anteriores ao uso definitivo. Exportação e recuperação pela interface continuam fora do MVP.
-- Django, PostgreSQL, Google, MusicBrainz e os fornecedores de infraestrutura são propostas, não escolhas aprovadas.
-- A pasta foi verificada e ainda não é um repositório Git.
+- A estrutura geral com monólito Django, páginas renderizadas no servidor e PostgreSQL compartilhado foi aprovada na revisão da B01, assim como revisão global, repetição segura por UUID, geração após restauração, identidade prévia e validação da infraestrutura gratuita. As decisões estão registradas na seção 13 de `ARCHITECTURE.md`. Google, MusicBrainz, fornecedores de infraestrutura e detalhes técnicos não avaliados continuam propostos.
+- O projeto já possui repositório Git e estrutura inicial Django. A revisão da B01 ocorre na branch `docs/b01-revisao-arquitetura`.
 - Aprovar este backlog não autoriza implementação, instalação, operações Git, configuração externa, migração ou deploy.
 - O proprietário escreverá testes e implementação com mentoria, uma tarefa por vez.
 
@@ -25,7 +26,7 @@
 - **P2:** comprovação integrada e preparação para uso definitivo.
 - **P3:** avaliação de uso ou melhoria posterior.
 
-Prioridade não substitui dependência: uma tarefa só começa quando suas dependências estiverem satisfeitas. Todos os itens estão **a fazer**; decisões e provas podem terminar com uma limitação documentada, que deverá ser resolvida antes de liberar seus dependentes.
+Prioridade não substitui dependência: uma tarefa só começa quando suas dependências estiverem satisfeitas. B01 está **concluída**, com decisões aprovadas e registradas e revisão ativa realizada. Há arquivos de preparação relacionados a B06/B07, cujos critérios e dependências ainda precisam ser conferidos antes de registrar conclusão. Os demais itens permanecem **a fazer**; decisões e provas podem terminar com uma limitação documentada, que deverá ser resolvida antes de liberar seus dependentes.
 
 CA significa critério de aceitação. As referências abaixo apontam para os identificadores de `REQUIREMENTS.md`.
 
@@ -37,7 +38,7 @@ Estas tarefas produzem decisões ou evidências, sem entregar funcionalidades do
 
 | ID / prioridade | Objetivo | Dependências | Critérios de aceitação | Verificação prevista | Risco principal |
 |---|---|---|---|---|---|
-| B01 · P0 | Revisar e decidir sobre a arquitetura proposta | — | Registrar aprovação, ajustes ou rejeição; explicitar revisão global, identidade prévia, geração de operações e limitações gratuitas | Conferência das decisões com requisitos e proprietário | Tratar proposta como escolha aprovada |
+| B01 · P0 · concluída em 22/10/2026 | Revisar e decidir sobre a arquitetura proposta | — | Registrar aprovação, ajustes ou rejeição; explicitar revisão global, identidade prévia, geração de operações e limitações gratuitas | Decisões registradas na seção 13 de ARCHITECTURE.md; revisão ativa sobre UUID realizada com o proprietário | Tratar proposta como escolha aprovada |
 | B02 · P0 | Avaliar orçamento e infraestrutura candidata | B01 | Registrar cotas, suspensão, persistência, TLS, permissões de banco, ordenação em português e comportamento ao exceder limites; nenhuma cobrança automática aceita | Revisão documental e, quando autorizado, configuração real | Orçamento zero inviável para as metas |
 | B03 · P0 | Validar catálogo com 30 álbuns representativos | B01 | Registrar cobertura, licença, título/artistas, dois anos, coletâneas, colaborações, homônimos, edições e paginação; decidir se o candidato atende P08 | Consultas controladas autorizadas e comparação manual | Cobertura insuficiente ou anos interpretados incorretamente |
 | B04 · P0 | Definir autorização prévia da identidade | B01 | Aprovar obtenção verificada de emissor/identificador da conta, vínculo do proprietário, configuração gratuita e política de registros; não usar primeiro login como autorização | Revisão do procedimento e prova autorizada do provedor | Vincular terceiro ou manter entrada alternativa |
@@ -150,10 +151,12 @@ Esses itens precisam de análise e aprovação próprias antes de entrar na impl
 
 ## 11. Próxima ação
 
-**B01 — revisar a arquitetura.** É a menor próxima tarefa porque não exige instalar ferramentas nem modificar o produto.
+**B01 concluída.** A estrutura geral e as cinco decisões foram aprovadas e registradas na seção 13 de `ARCHITECTURE.md`. Na revisão ativa, o proprietário identificou a unicidade do UUID; a mentoria complementou que o servidor precisa reconhecer a operação e devolver seu resultado sem repetir o efeito. O proprietário autorizou o fechamento. As validações técnicas futuras continuam pendentes.
+
+**Próxima tarefa prevista: B02 — avaliar orçamento e infraestrutura candidata**, aguardando decisão do proprietário para iniciar.
 
 Após aprovar as decisões e preparar o ambiente, a primeira microtarefa de código sugerida é um teste de B08: aceitar o ano atual e recusar o seguinte. O proprietário escreve o teste.
 
 **Revisão ativa:** qual a diferença entre impedir duas execuções da mesma solicitação e decidir se duas edições representam o mesmo álbum?
 
-**Evidência deste planejamento:** documentos analisados e ausência de repositório Git verificada. Nenhum teste de aplicação, instalação, integração externa ou deploy foi executado.
+**Evidência da revisão atual:** repositório Git, branch de trabalho e arquivos de preparação inicial conferidos; aprovações explícitas do proprietário registradas com autorização. A presença de configuração de banco, teste e CI não comprova sua execução bem-sucedida. Nenhum teste de aplicação, instalação, integração externa ou deploy foi executado nesta revisão documental.
