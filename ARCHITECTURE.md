@@ -420,3 +420,134 @@ Após aprovação, a primeira microtarefa sugerida é definir um teste pequeno d
 **Evidência da elaboração original:** documentos locais e documentação pública consultados, com produção desta proposta sem implementação ou validação de fornecedores naquela etapa.
 
 **Evidência da revisão da B01:** repositório Git e arquivos da preparação inicial conferidos; branch de trabalho `docs/b01-revisao-arquitetura`. A estrutura geral e as cinco decisões acima foram aprovadas explicitamente pelo proprietário, que autorizou seu registro documental. A revisão ativa sobre UUID foi realizada, e o proprietário autorizou o fechamento da B01 em 22/10/2026. As validações técnicas futuras continuam pendentes. Nesta revisão documental, não foram executados testes de aplicação, instalações, integrações externas ou deploy.
+
+## 14. B02 — avaliação e fechamento
+
+**Data da consulta documental:** 23/10/2026.
+
+**Status:** avaliação concluída em 23/10/2026, com limitações registradas e fechamento autorizado pelo proprietário na branch `docs/b02-infraestrutura`. Render Free, Neon Free e GitHub Actions permanecem candidatos para as próximas avaliações; não houve aprovação de uso definitivo.
+
+### Cotas, suspensão e persistência
+
+| Candidato / recurso | Evidência documental | Consequência e pendência |
+|---|---|---|
+| Render Free — aplicação | Suspende após 15 minutos sem tráfego; retomada leva aproximadamente um minuto. Alterações no disco local se perdem ao suspender, reiniciar ou republicar | Manter a coleção em PostgreSQL externo. Medir retomada e impacto na meta de pesquisa em até 15 segundos |
+| Render Free — horas | 750 horas mensais por workspace, compartilhadas pelos serviços gratuitos; ao esgotar, suspende esses serviços até o mês seguinte | Conferir consumo compartilhado na conta |
+| Render — transferência | Sem forma de pagamento, exceder a cota suspende serviços gratuitos pelo restante do mês; com pagamento, pode haver cobrança adicional | Conferir a cota efetiva do plano e impedir cobrança automática antes da configuração |
+| Render Hobby — preparação de publicação (build) | 500 minutos mensais. Sem forma de pagamento ou ao atingir o limite de gastos, bloqueia novas preparações; a versão publicada pode continuar ativa | Conferir plano, consumo e limite de gastos efetivos |
+| Neon Free — processamento e transferência | 100 CU-horas de processamento e 5 GB de transferência pública por projeto/mês. Esgotar um desses recursos suspende o processamento até o próximo ciclo, sem mudança de plano | Conexões existentes caem e novas conexões ficam bloqueadas; medir consumo real |
+| Neon Free — armazenamento | 1 GB por projeto e 20 GB no total da conta. Ao atingir o limite, operações que aumentem o armazenamento falham. Esses limites não se renovam mensalmente | A documentação informa que exceder cotas do Free não apaga os dados nem gera cobrança excedente; isso não substitui backup |
+| GitHub Actions — automação | Para GitHub Free em repositório privado: 2.000 minutos mensais e 500 MB de artefatos; artefatos compartilham a franquia de armazenamento com GitHub Packages. Sem pagamento válido, esgotar cotas bloqueia o uso | Confirmar plano, visibilidade, consumo compartilhado e controles de gastos na conta real; somar testes e futuros backups |
+
+CU-hora mede consumo computacional, não quantidade de álbuns. As cotas anunciadas não comprovam capacidade para a biblioteca. No Neon, a suspensão por inatividade ocorre após cinco minutos e preserva os dados; é diferente de esgotar a franquia mensal.
+
+**Fontes oficiais:** [Render Free](https://render.com/docs/free), [preparação de publicações no Render](https://render.com/docs/build-pipeline), [planos do Neon](https://neon.com/docs/introduction/plans), [limites do Neon Free](https://neon.com/faqs/free-plan-limits-and-quotas) e [cobrança do GitHub Actions](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
+Se o banco estiver indisponível, informar falha de consulta; mostrar coleção vazia exige consulta bem-sucedida sem resultados. Nas gravações, preservar o tratamento de resultado incerto da seção 6, sem presumir falha ou sucesso pela queda da conexão.
+
+### TLS e permissões do banco
+
+TLS criptografa a conexão. O Neon suporta `sslmode=verify-full`, que verifica a cadeia de confiança do certificado e sua correspondência com o nome do servidor. A proposta é configurar esse modo e os certificados confiáveis no ambiente da aplicação. A conexão local pelo `psql` teve TLS observado, conforme a evidência abaixo; a configuração e a conexão do Django ainda não foram validadas. [Conexão segura no Neon](https://neon.com/docs/connect/connect-securely).
+
+Aplicar o menor privilégio: conceder somente o acesso necessário a cada finalidade.
+
+| Credencial proposta | Responsabilidade e limite |
+|---|---|
+| Aplicação | Consultar, inserir, editar e excluir dados necessários ao funcionamento, incluindo permissões auxiliares necessárias; sem administrar usuários nem alterar a estrutura |
+| Migrações | Alterar a estrutura do banco, como criar tabelas; manter essa credencial separada da usada no atendimento às requisições |
+| Backup | Ler os objetos e dados necessários à cópia, sem alterar dados; detalhar na B05 e comprovar nas tarefas de recuperação |
+
+Papéis criados pelo painel, API ou CLI do Neon recebem associação a `neon_superuser`. Para credenciais restritas, criar papéis via SQL e conceder permissões explicitamente, conferindo também permissões herdadas e públicas. Apagar uma tabela não exige necessariamente superusuário: seu proprietário também pode fazê-lo. A credencial da aplicação não deve ser proprietária das tabelas. [Papéis no Neon](https://neon.com/docs/manage/roles), [controle de acesso](https://neon.com/docs/manage/database-access) e [permissões no PostgreSQL](https://www.postgresql.org/docs/current/ddl-priv.html).
+
+### Ordenação em português
+
+Collation é a regra de comparação e ordenação de textos. Manter a proposta da seção 6: usar ICU de português, com desempate pelo texto original e ID. ICU é uma biblioteca que oferece regras por idioma; sua disponibilidade depende da preparação do servidor PostgreSQL. Criar uma collation exige permissão `CREATE` no esquema de destino. [Collations no PostgreSQL](https://www.postgresql.org/docs/17/collation.html) e [CREATE COLLATION](https://www.postgresql.org/docs/current/sql-createcollation.html).
+
+A consulta documental inicial não confirmou suficientemente a disponibilidade no Neon. Na avaliação prática posterior, executada pelo proprietário, a consulta a `pg_catalog.pg_collation` retornou `pt-BR-x-icu`, com locale `pt-BR`. A consulta de ordenação também funcionou sob o papel de avaliação `music_library_b02_app`, conforme os resultados compartilhados abaixo. Isso comprova disponibilidade e uso nessa conexão e amostra, sem exigir criação de uma collation própria.
+
+O ID resolve empates de ordenação entre registros e ajuda a estabilizar a paginação quando os dados não mudam; ordenar não determina se dois artistas representam a mesma pessoa. Diferenças de caixa, paginação real e integração com as futuras tabelas ainda não foram testadas.
+
+### Evidências da avaliação prática no Neon
+
+Após autorizações específicas, o proprietário criou a conta e o projeto no Neon e executou os comandos no SQL Editor. As evidências deste registro são as capturas de tela e os resultados compartilhados na conversa, não uma execução remota pelo agente.
+
+| Verificação | Evidência apresentada e alcance |
+|---|---|
+| Projeto de avaliação | As telas mostram o projeto `music-library`, a branch do Neon `production` e região AWS US East 2 (Ohio). A tela Overview confirma `Version 16`, coerente com a escolha informada pelo proprietário; não houve consulta de versão ao servidor. A branch do Neon é independente da branch Git `docs/b02-infraestrutura` |
+| Plano e cotas exibidos em Billing | A captura identifica `Free Plan` como plano atual, por US$ 0/mês, com 1 GB de armazenamento por projeto, 100 horas de processamento anunciadas, escalonamento até 2 CU e 10 branches. A página também oferece um adicional por US$ 10/mês; a imagem não indica contratação desse adicional. A seção de forma de pagamento não foi inspecionada |
+| Forma de pagamento — relato do proprietário | Ao ser perguntado se cadastrou cartão ou outra forma de pagamento na criação da conta Neon, o proprietário respondeu que não cadastrou nada e autorizou registrar essa informação. Trata-se de relato do proprietário, sem inspeção da seção de pagamento ou verificação independente de todos os meios de cobrança da conta |
+| Consumo exibido em Overview | Em Usage, com início indicado em 23/10/2026, o painel mostra Compute em 0 CU-hrs e Storage, History e Network transfer em 0 kB. São valores exibidos na captura, não prova de ausência de consumo: as consultas anteriores executaram. Não foi verificada a frequência de atualização nem a precisão de apresentação desses indicadores |
+| Processamento e histórico exibidos em Overview | A tela mostra Default compute de 0,25 a 2 CU, uma branch e History retention de 6 horas. Essa janela não cobre, por si só, a exigência de recuperação dos últimos sete dias; a solução de cópias e recuperação permanece pendente em B05 e nas tarefas de demonstração |
+| Conexão administrativa | `neondb_owner`: `superusuario = false`, mas pode criar bancos e papéis, é membro de `neon_superuser` e pode criar objetos no esquema `public`. Não usar essa credencial no atendimento cotidiano da aplicação |
+| Papel de avaliação | Criação de `music_library_b02_app` com `NOLOGIN`, `NOSUPERUSER`, `NOCREATEDB`, `NOCREATEROLE`, `NOREPLICATION` e `NOBYPASSRLS`; o editor informou sucesso. A consulta posterior confirmou login, superusuário, criação de bancos/papéis e associação a `neon_superuser` como `false`; `USAGE` em `public` como `true` e `CREATE` como `false`. Não é uma auditoria de todas as permissões efetivas |
+| Tentativa inicial de assumir o papel | `SET LOCAL ROLE music_library_b02_app` falhou com SQLSTATE `42501`; a consulta de ordenação não executou nessa tentativa. O proprietário confirmou o encerramento por rollback. A leitura posterior mostrou `MEMBER = true` e `SET = false` para `neondb_owner` em relação ao papel |
+| Ajuste autorizado da associação | Após autorização, o proprietário executou `GRANT music_library_b02_app TO neondb_owner WITH SET TRUE`. A consulta posterior retornou `pode_assumir_papel = true`. A autorização permite ao administrador assumir o papel; não concede poderes administrativos ao papel de avaliação |
+| Ordenação sob papel restrito | Bloco com `BEGIN READ ONLY`, `SET LOCAL ROLE`, consulta sobre `VALUES` e `COMMIT` executou sem erro. As cinco linhas retornaram `papel = music_library_b02_app`, ordenadas por nome com `pg_catalog."pt-BR-x-icu"`, texto original com `pg_catalog."C"` e ID: Álvaro (2), Ana (1), João (12), João (37), Zeca (3) |
+
+As consultas de ordenação não criaram tabelas nem gravaram dados da coleção. O papel foi criado e a associação foi alterada no banco remoto, com autorização. `NOLOGIN` permanece no papel; não foram criadas credenciais de conexão para a aplicação. O teste por `SET ROLE` não comprova autenticação independente, TLS da aplicação ou acesso às futuras tabelas. A leitura de `USAGE`/`CREATE` em `public` não comprova ausência de permissões em todos os outros objetos.
+
+**Referências para interpretar as consultas:** [catálogo de collations do PostgreSQL 16](https://www.postgresql.org/docs/16/catalog-pg-collation.html), [atributos dos papéis](https://www.postgresql.org/docs/16/view-pg-roles.html) e [funções de consulta de privilégios](https://www.postgresql.org/docs/16/functions-info.html).
+
+### Evidência de TLS na conexão local pelo psql
+
+Com autorização específica para uma verificação externa de leitura, o proprietário conectou pelo terminal ao endpoint com pooling do Neon, usando `neondb_owner`, e compartilhou os resultados. O agente não executou essa conexão. Na preparação local, foram verificados `psql` 16.15 e a disponibilidade de `/etc/ssl/certs/ca-certificates.crt`; não houve instalação ou alteração de arquivos de configuração.
+
+O comando orientado usava `psql -X -W`, `sslmode=verify-full`, `sslrootcert=/etc/ssl/certs/ca-certificates.crt`, timeout de conexão de 15 segundos e `default_transaction_read_only=on`. A senha era solicitada no prompt, sem compor o comando. Ao ser perguntado especificamente sobre os parâmetros `sslmode` e `sslrootcert`, o proprietário confirmou que não os modificou e autorizou registrar essa confirmação. O uso desses parâmetros é sustentado por seu relato; o agente não executou a conexão nem inspecionou o comando efetivamente usado.
+
+| Verificação | Resultado apresentado e alcance |
+|---|---|
+| Consulta inicial de pg_stat_ssl | Para `pid = pg_backend_pid()`, retornou `ssl = false`, com versão e cifra vazias. A consulta descreve o trecho de conexão visto pelo PostgreSQL e foi insuficiente para verificar o TLS entre o cliente local e o endpoint intermediário do Neon. O resultado não comprova tráfego local sem criptografia nem identifica, sozinho, a configuração interna do provedor |
+| Inspeção pelo cliente | `\conninfo` informou conexão a `neondb` como `neondb_owner` e `SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)`. Isso comprova o TLS observado pelo cliente nessa sessão |
+| Verificação do certificado e nome | O proprietário confirmou que manteve `sslmode=verify-full` e `sslrootcert=/etc/ssl/certs/ca-certificates.crt` sem modificações. Combinada com a conexão bem-sucedida e a saída de `\conninfo`, essa confirmação sustenta que a verificação do certificado e do nome do servidor passou nessa sessão local. A saída de `\conninfo`, isoladamente, não confirma o valor de `sslmode` |
+
+A verificação cobre uma conexão local com papel administrativo ao endpoint com pooling. Não valida a conexão independente do papel `NOLOGIN`, a configuração TLS do Django ou do futuro ambiente de hospedagem, nem testes de rejeição de certificado/nome inválido. Foi orientado encerrar a sessão com `\q`; o encerramento não foi apresentado como evidência.
+
+**Referências:** [TLS e verify-full no PostgreSQL 16](https://www.postgresql.org/docs/16/libpq-ssl.html) e [comandos do psql](https://www.postgresql.org/docs/16/app-psql.html).
+
+### Evidências da inspeção do Render
+
+O proprietário acessou sua conta existente pelo GitHub e compartilhou capturas do workspace `My Workspace` e de Billing. As evidências abaixo refletem o painel apresentado, sem acesso remoto do agente à conta ou alteração das configurações.
+
+| Verificação | Evidência apresentada e alcance |
+|---|---|
+| Plano e pagamento | Current Plan: Hobby. Payment Method: `No card on file`, confirmando ausência de cartão cadastrado naquele momento |
+| Horas gratuitas e transferência | Monthly Included Usage mostra 0 de 750 horas gratuitas e 0 MB de 5 GB de transferência |
+| Preparação de publicações | Included Pipeline Minutes mostra 0 de 500 minutos. A captura posterior de Settings → Build Pipeline confirma Starter selecionado, com 500 minutos gratuitos e limite mensal de gastos de US$ 0. O aviso informa que, esgotados os minutos com esse limite atingido, builds e outras tarefas de preparação param. A tarifa anunciada de US$ 5 por 1.000 minutos adicionais não indica contratação ou cobrança efetiva |
+| Recursos compartilhados | Billing informa que as cotas se aplicam ao workspace inteiro; há 3 de 25 serviços e 0 de 2 domínios personalizados. A tela anterior de Projects mostra 1 serviço ativo e 2 suspensos; não foram conferidos seus tipos ou planos individuais |
+| Valores financeiros exibidos | Cobrança acumulada no mês e projeção para outubro: US$ 0,00. Saldo de créditos: US$ 0,00. As faturas visíveis de julho, agosto e setembro de 2026 aparecem como pagas, com total de US$ 0,00; isso não indica cartão cadastrado |
+
+Os valores de consumo zerados registram o que estava exibido; não garantem ausência de consumo futuro ou capacidade disponível durante o piloto. Os serviços existentes compartilham as cotas aplicáveis e precisam ser considerados na avaliação, sem alterá-los nesta etapa. O aviso genérico de cobrança por excedentes na página não substitui a regra documental para contas sem forma de pagamento, descrita acima, nem comprova que um excedente foi testado.
+
+Nesta inspeção não houve criação de serviço, publicação da aplicação, cadastro de cartão ou mudança do plano ou do limite de gastos. A cota de transferência do Render (5 GB) e o limite de gastos de preparação de publicações (US$ 0/mês) têm evidência no painel. Esse limite é específico dos builds e outras tarefas de preparação, não um teto global para todos os recursos do Render. O bloqueio ao esgotar minutos foi descrito pelo painel, sem teste de esgotamento. Permanece pendente a medição do comportamento da aplicação, incluindo retomada após inatividade.
+
+### Evidências da inspeção do GitHub Actions
+
+O proprietário compartilhou capturas de Billing and licensing da conta pessoal, incluindo Overview, Actions e Budgets and alerts. A inspeção foi visual, sem alteração de configurações ou execução de workflows nesta etapa.
+
+| Verificação | Evidência apresentada e alcance |
+|---|---|
+| Plano | Overview identifica GitHub Free por US$ 0/mês |
+| Visibilidade do repositório | A captura da página `FilipeMadeira13/music-library` mostra o indicador Public. A visibilidade de `music-library-app` não foi conferida. A consulta não alterou a visibilidade ou as configurações dos repositórios |
+| Uso faturável de Actions | No período Current month, a aba Actions mostra US$ 0 faturável, composto por US$ 0,09 de uso bruto e US$ 0,09 de descontos. A origem dos descontos não foi investigada; não inferir visibilidade dos repositórios ou cobrança de US$ 0,09 a partir desses valores |
+| Franquias exibidas | Actions minutes: 0 de 2.000 minutos usados. Actions storage: 0 GB de 0,5 GB usados. Esses são os valores apresentados; não comprovam ausência de execuções ou garantia de capacidade futura |
+| Uso por repositório | A lista atribui uso bruto a `music-library-app` (US$ 0,06) e `music-library` (US$ 0,03). A conta tem usos de mais de um repositório, que devem ser considerados ao planejar a franquia compartilhada |
+| Orçamento e bloqueio | Budgets and alerts mostra orçamento de Actions no escopo Account para `FilipeMadeira13`, com limite de US$ 0 e US$ 0 gastos, marcado como 100% e `Usage blocked`. É evidência do controle de gastos adicionais indicado pelo painel, não um teste de esgotamento. A marcação não significa que a franquia gratuita acabou |
+| Alertas | Included usage alerts aparece como On; recebimento e entrega dos alertas não foram testados |
+
+Não foi necessário mudar o orçamento: o limite zero já estava exibido. Não foram inspecionados os detalhes internos de edição desse orçamento nem a forma de pagamento da conta. O uso efetivo dos workflows ainda precisa ser conferido para planejar testes e backups; as franquias e o controle de gastos observados não demonstram a viabilidade da recuperação gratuita.
+
+**Ajuste da premissa para testes:** como `music-library` é público, aplica-se a gratuidade de execução de Actions com runners padrão hospedados pelo GitHub, conforme as [regras oficiais](https://docs.github.com/en/billing/concepts/product-billing/github-actions). Essa regra é compatível com uso bruto compensado por descontos, mas a origem dos descontos exibidos não foi investigada. Runners maiores e outros recursos têm regras próprias; não interpretar a gratuidade de execução como ausência de cotas para todos os recursos.
+
+**Ajuste da proposta de backups:** a solução candidata da seção 10 pressupõe artefatos em repositório privado; o repositório público do código não satisfaz essa premissa. Na B05, avaliar armazenamento privado separado, que pode ser um repositório privado dedicado ou outra alternativa gratuita, mantendo criptografia antes do envio, controle de acesso e validação de cotas e retenção. A franquia aplicável ao armazenamento e à automação privados deve ser avaliada separadamente da execução gratuita dos testes públicos. Este registro não autoriza mudança de visibilidade, criação de outro repositório ou envio de backups. A escolha do destino permanece pendente.
+
+### Decisão de fechamento, evidências e próximos limites
+
+Manter Render Free, Neon Free e GitHub Actions em avaliação para o piloto. A retomada do Render é um risco explícito para a meta de pesquisa, sem medição que comprove atendimento ou inviabilidade. Não aceitar cobrança automática. A disponibilidade e o uso da ordenação em português na amostra foram demonstrados sob o papel de avaliação. O painel do Neon confirmou plano Free, versão 16 e as cotas descritas na captura de Billing; os indicadores de consumo também foram localizados. O proprietário relatou não ter cadastrado forma de pagamento na criação da conta Neon; a seção de pagamento e os demais controles de cobrança não foram inspecionados. No Render, foram confirmados plano Hobby, ausência de cartão, cotas compartilhadas, valores financeiros exibidos e limite de gastos de builds em US$ 0/mês. No GitHub, foram confirmados plano Free, franquias de Actions exibidas, visibilidade pública de `music-library` e orçamento de Actions de US$ 0 no escopo da conta, com bloqueio indicado e alertas de uso incluído ativados. Continuam pendentes a inspeção dos controles de cobrança do Neon, a conferência da cota efetiva de transferência do Neon no painel, o planejamento do uso compartilhado de Actions e a escolha de armazenamento privado de backups na B05, as permissões nas futuras tabelas, a conexão da aplicação com TLS e os demais cenários de ordenação. Recuperação e backups serão aprofundados na B05 e demonstrados nas tarefas posteriores; as seis horas de histórico exibidas não encerram essa validação.
+
+**Revisão ativa realizada:** o proprietário reconheceu o risco do disco efêmero e distinguiu indisponibilidade de coleção vazia. Na mentoria, foram esclarecidas a diferença entre superusuário e proprietário de tabela e a função do ID no desempate da ordenação.
+
+**Revisão ativa de encerramento:** ao explicar por que a avaliação não garante uso definitivo, o proprietário identificou as limitações de suspensão do sistema. A mentoria complementou o risco de indisponibilidade por cotas e a necessidade de demonstrar sete dias de cópias e recuperação com perda máxima de 24 horas. O proprietário autorizou encerrar a B02 com essas limitações e manter os fornecedores como candidatos. As diferenças entre associação a um papel, autorização para assumi-lo e herança de permissões, assim como a proteção adicional de `verify-full`, foram explicadas; não foi obtida uma resposta autônoma posterior sobre esses dois detalhes técnicos, que podem ser retomados na implementação.
+
+**Alcance do encerramento:** foram registrados os critérios de avaliação da B02: cotas, suspensão, persistência, TLS, permissões de banco, ordenação em português, comportamento documentado ao exceder limites e restrição de cobrança automática. O fechamento não converte documentação em teste executado nem elimina pendências: a cota de transferência do Neon permanece documental; o pagamento no Neon tem relato do proprietário, sem inspeção independente; capacidade e retomada do Render ainda precisam de medição. A configuração TLS do Django e as permissões sobre tabelas serão verificadas na implementação e na preparação do piloto (B31/B35); ordenação integrada e paginação serão testadas nas funcionalidades correspondentes, incluindo B18/B19; desempenho será medido na B38. Armazenamento privado, cotas compartilhadas e recuperação gratuita serão avaliados na B05 e demonstrados em B33–B36. Qualquer limitação incompatível com uma etapa dependente deve ser resolvida antes de liberá-la. O encerramento permite prosseguir com avaliações e preparação local, sem autorizar plano pago, redução de metas, novas configurações externas ou deploy.
+
+**Escopo verificado:** documentos do projeto, documentação pública e resultados da avaliação prática apresentados pelo proprietário. A etapa inicial foi documental; posteriormente, houve criação autorizada de conta/projeto, papel e ajuste de associação no Neon, além das consultas e da conexão local descritas acima, da inspeção visual do plano, pagamento e consumo do workspace existente no Render e da inspeção de plano, cotas, orçamento e alertas de Actions na conta GitHub. Não foram executados testes de aplicação, instalações, migrações ou deploy nesta avaliação. B02 concluída como avaliação com limitações registradas. Próxima tarefa prevista: B03, ainda não iniciada.
