@@ -1,7 +1,8 @@
 # Music Library — Backlog priorizado
 
-**Data:** 22/10/2026.  
-**Status:** B01 concluída em 22/10/2026, com decisões registradas e revisão ativa realizada. Preparação técnica inicial já presente, sem aceite automático dos critérios de B06/B07.
+**Data:** 23/10/2026.
+
+**Status:** B01 concluída em 22/10/2026 e B02 concluída como avaliação com limitações registradas em 23/10/2026, ambas com fechamento autorizado e revisão ativa realizada. Preparação técnica inicial já presente, sem aceite automático dos critérios de B06/B07. B03 é a próxima tarefa prevista, ainda não iniciada.
 
 **Fontes:** [PROJECT_SCOPE.md](PROJECT_SCOPE.md), [REQUIREMENTS.md](REQUIREMENTS.md) e [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -11,7 +12,7 @@
 - Ano original é obrigatório; ano da versão é opcional. Trocar a versão preserva os links.
 - Backups e restauração técnica são condições anteriores ao uso definitivo. Exportação e recuperação pela interface continuam fora do MVP.
 - A estrutura geral com monólito Django, páginas renderizadas no servidor e PostgreSQL compartilhado foi aprovada na revisão da B01, assim como revisão global, repetição segura por UUID, geração após restauração, identidade prévia e validação da infraestrutura gratuita. As decisões estão registradas na seção 13 de `ARCHITECTURE.md`. Google, MusicBrainz, fornecedores de infraestrutura e detalhes técnicos não avaliados continuam propostos.
-- O projeto já possui repositório Git e estrutura inicial Django. A revisão da B01 ocorre na branch `docs/b01-revisao-arquitetura`.
+- O projeto já possui repositório Git e estrutura inicial Django. A revisão da B01 foi realizada na branch `docs/b01-revisao-arquitetura`; a avaliação da B02 e seu fechamento foram registrados na branch `docs/b02-infraestrutura`.
 - Aprovar este backlog não autoriza implementação, instalação, operações Git, configuração externa, migração ou deploy.
 - O proprietário escreverá testes e implementação com mentoria, uma tarefa por vez.
 
@@ -26,7 +27,7 @@
 - **P2:** comprovação integrada e preparação para uso definitivo.
 - **P3:** avaliação de uso ou melhoria posterior.
 
-Prioridade não substitui dependência: uma tarefa só começa quando suas dependências estiverem satisfeitas. B01 está **concluída**, com decisões aprovadas e registradas e revisão ativa realizada. Há arquivos de preparação relacionados a B06/B07, cujos critérios e dependências ainda precisam ser conferidos antes de registrar conclusão. Os demais itens permanecem **a fazer**; decisões e provas podem terminar com uma limitação documentada, que deverá ser resolvida antes de liberar seus dependentes.
+Prioridade não substitui dependência: uma tarefa só começa quando suas dependências estiverem satisfeitas. B01 está **concluída**, com decisões aprovadas e registradas e revisão ativa realizada. B02 está **concluída como avaliação com limitações registradas**, mantendo Render Free, Neon Free e GitHub Actions como candidatos; não comprova prontidão para uso definitivo. Há arquivos de preparação relacionados a B06/B07, cujos critérios e dependências ainda precisam ser conferidos antes de registrar conclusão. Os demais itens permanecem **a fazer**; decisões e provas podem terminar com uma limitação documentada, que deverá ser resolvida antes de liberar seus dependentes.
 
 CA significa critério de aceitação. As referências abaixo apontam para os identificadores de `REQUIREMENTS.md`.
 
@@ -39,7 +40,7 @@ Estas tarefas produzem decisões ou evidências, sem entregar funcionalidades do
 | ID / prioridade | Objetivo | Dependências | Critérios de aceitação | Verificação prevista | Risco principal |
 |---|---|---|---|---|---|
 | B01 · P0 · concluída em 22/10/2026 | Revisar e decidir sobre a arquitetura proposta | — | Registrar aprovação, ajustes ou rejeição; explicitar revisão global, identidade prévia, geração de operações e limitações gratuitas | Decisões registradas na seção 13 de ARCHITECTURE.md; revisão ativa sobre UUID realizada com o proprietário | Tratar proposta como escolha aprovada |
-| B02 · P0 | Avaliar orçamento e infraestrutura candidata | B01 | Registrar cotas, suspensão, persistência, TLS, permissões de banco, ordenação em português e comportamento ao exceder limites; nenhuma cobrança automática aceita | Revisão documental e, quando autorizado, configuração real | Orçamento zero inviável para as metas |
+| B02 · P0 · concluída em 23/10/2026, com limitações | Avaliar orçamento e infraestrutura candidata | B01 | Registrar cotas, suspensão, persistência, TLS, permissões de banco, ordenação em português e comportamento ao exceder limites; nenhuma cobrança automática aceita | Evidências, decisão e limites na seção 14 de ARCHITECTURE.md: documentação, painéis apresentados pelo proprietário, papel de avaliação, ordenação e TLS local; revisão ativa e fechamento autorizados | Candidatos não comprovam capacidade, desempenho após suspensão ou recuperação gratuita; validar nas etapas próprias antes do uso definitivo |
 | B03 · P0 | Validar catálogo com 30 álbuns representativos | B01 | Registrar cobertura, licença, título/artistas, dois anos, coletâneas, colaborações, homônimos, edições e paginação; decidir se o candidato atende P08 | Consultas controladas autorizadas e comparação manual | Cobertura insuficiente ou anos interpretados incorretamente |
 | B04 · P0 | Definir autorização prévia da identidade | B01 | Aprovar obtenção verificada de emissor/identificador da conta, vínculo do proprietário, configuração gratuita e política de registros; não usar primeiro login como autorização | Revisão do procedimento e prova autorizada do provedor | Vincular terceiro ou manter entrada alternativa |
 | B05 · P0 | Avaliar recuperação gratuita antes de investir no piloto remoto | B02 | Identificar execução, armazenamento, criptografia, recuperação da chave, cotas, retenção e supervisão; registrar como serão avaliadas as 24 horas; alternativa inviável exige decisão | Conferência de capacidade/custos e simulação do procedimento | Confundir agendamento com proteção recuperável |
@@ -153,10 +154,12 @@ Esses itens precisam de análise e aprovação próprias antes de entrar na impl
 
 **B01 concluída.** A estrutura geral e as cinco decisões foram aprovadas e registradas na seção 13 de `ARCHITECTURE.md`. Na revisão ativa, o proprietário identificou a unicidade do UUID; a mentoria complementou que o servidor precisa reconhecer a operação e devolver seu resultado sem repetir o efeito. O proprietário autorizou o fechamento. As validações técnicas futuras continuam pendentes.
 
-**Próxima tarefa prevista: B02 — avaliar orçamento e infraestrutura candidata**, aguardando decisão do proprietário para iniciar.
+**B02 concluída em 23/10/2026 como avaliação com limitações registradas.** As evidências e o alcance do fechamento estão na seção 14 de `ARCHITECTURE.md`. Render Free, Neon Free e GitHub Actions permanecem candidatos. Foram documentados os limites e comportamentos e reunidas evidências de painéis, permissões, ordenação e TLS local. Permanecem as validações de implementação, desempenho e recuperação; não há aceite de cobrança automática, redução de metas ou autorização de uso definitivo. B05 avaliará recuperação e armazenamento privado separado do repositório público do código.
+
+**Próxima tarefa prevista: B03 — validar catálogo com 30 álbuns representativos**, aguardando decisão do proprietário para iniciar. O fechamento da B02 não inicia B03, não configura outros serviços e não autoriza commit, push ou deploy.
 
 Após aprovar as decisões e preparar o ambiente, a primeira microtarefa de código sugerida é um teste de B08: aceitar o ano atual e recusar o seguinte. O proprietário escreve o teste.
 
-**Revisão ativa:** qual a diferença entre impedir duas execuções da mesma solicitação e decidir se duas edições representam o mesmo álbum?
+**Revisão ativa da B02:** o proprietário identificou que as limitações de suspensão impedem garantir o uso definitivo. A mentoria complementou indisponibilidade por cotas e a necessidade de demonstrar recuperação dos últimos sete dias com perda máxima de 24 horas. O proprietário autorizou o fechamento com essas limitações explícitas.
 
-**Evidência da revisão atual:** repositório Git, branch de trabalho e arquivos de preparação inicial conferidos; aprovações explícitas do proprietário registradas com autorização. A presença de configuração de banco, teste e CI não comprova sua execução bem-sucedida. Nenhum teste de aplicação, instalação, integração externa ou deploy foi executado nesta revisão documental.
+**Evidência da revisão atual:** documentos e documentação pública consultados, painéis de Neon/Render/GitHub apresentados pelo proprietário e resultados de consultas ao Neon registrados na seção 14 de `ARCHITECTURE.md`. O proprietário executou as ações externas autorizadas, incluindo criação de conta/projeto e papel de avaliação, ajuste de associação, consultas de ordenação e conexão local pelo `psql` com TLS. A presença de configuração de banco, teste e CI não comprova sua execução bem-sucedida. Não foram executados testes de aplicação, instalações, migrações ou deploy na avaliação da B02.
