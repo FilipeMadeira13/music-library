@@ -4,7 +4,7 @@ Data: 29/10/2026. Fonte de verdade: [REQUIREMENTS.md](REQUIREMENTS.md).
 
 **Decisão confirmada pelo autor: este será um projeto novo.** A comparação com o projeto anterior e a escolha entre evolução e nova versão estão resolvidas e não são tarefas pendentes. Essa decisão atualiza a premissa de planejamento, sem alterar os documentos de origem.
 
-Este backlog organiza o trabalho; as escolhas técnicas confirmadas na B01 estão registradas em [DECISOES.md](DECISOES.md). O registro não autoriza implementar funcionalidades, instalar ferramentas ou publicar a aplicação. A **B01 está concluída** e as outras **30 tarefas estão pendentes**. Todos os testes descritos são **planejados**, sem implementação ou execução afirmada neste documento.
+Este backlog organiza o trabalho; as escolhas técnicas confirmadas na B01 estão registradas em [DECISOES.md](DECISOES.md). O registro não autoriza implementar funcionalidades, instalar ferramentas ou publicar a aplicação. As **B01 e B02 estão concluídas** e as outras **29 tarefas estão pendentes**. O teste mínimo de infraestrutura foi executado na B02; os testes de produto descritos permanecem **planejados**.
 
 ## 1. Prioridades, dependências e forma de trabalho
 
@@ -48,11 +48,12 @@ Aplicar a cada tarefa de produto, além de seus critérios específicos:
 
 ### B02 — Preparar ambiente mínimo de desenvolvimento
 
-- **Estado / prioridade:** Pendente / P0.
+- **Estado / prioridade:** Concluída em 29/10/2026 / P0.
 - **Objetivo:** permitir iniciar a aplicação e executar verificações localmente.
 - **Dependências:** B01.
 - **Aceitação:** após as aprovações específicas necessárias para instalações e alterações, preparar somente o ambiente escolhido e registrar os passos de execução. Configuração de Git, se proposta, exige autorização própria; não é pré-requisito documental deste backlog.
 - **Verificação planejada:** iniciar e encerrar a aplicação e executar um teste mínimo de funcionamento da infraestrutura de testes, com resultados registrados e sem serviços de produção.
+- **Evidência de conclusão:** ambiente virtual `venv/`, Python 3.12.3, SQLite 3.45.1 e Django 5.2.18; dependências fixadas em `requirements.txt`; projeto `config/` e app `library/` registrado. O agente executou `manage.py check` sem problemas identificados e `manage.py test` com 1 teste aprovado em banco separado em memória. O autor forneceu a saída do servidor local iniciado com `runserver 127.0.0.1:8000 --noreload` (com a opção Python `-B`), resposta HTTP 200 para `GET /` e encerramento com `Ctrl+C`; em seguida, forneceu a saída de `manage.py migrate` com as 18 migrações internas aplicadas com sucesso. Passos e limites registrados em [DECISOES.md](DECISOES.md#5-evidências-e-limites-das-etapas).
 - **Risco principal:** ambiente não reproduzível ou preparação maior que a primeira entrega.
 - **Referências:** seção 8 dos requisitos; RNF-05.
 
@@ -430,6 +431,6 @@ As relações abaixo indicam onde o comportamento será entregue ou verificado; 
 
 ## 10. Próxima ação e revisão de aprendizado
 
-**Próxima tarefa sugerida: B02 — preparar ambiente mínimo de desenvolvimento.** Seguir as escolhas registradas em [DECISOES.md](DECISOES.md), explicando o impacto e obtendo as aprovações específicas necessárias antes de instalações ou alterações. A conclusão documental da B01 não significa que o ambiente ou as funcionalidades foram implementados.
+**Próxima tarefa sugerida: B03 — cadastrar artista.** O ambiente mínimo foi verificado na B02. Começar pelo teste de cadastro válido, respeitando os critérios da B03 e a mentoria em pequenas etapas; o autor escreve testes e implementação. A conclusão da preparação não comprova funcionalidades de produto.
 
 Ao final de cada ciclo, explicar com as próprias palavras: qual regra foi protegida por um teste, qual resultado comprova isso e qual dependência permite escolher a tarefa seguinte? A revisão apoia o aprendizado e não condiciona a entrega documental deste backlog.
