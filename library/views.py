@@ -1,3 +1,4 @@
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -6,7 +7,11 @@ from .models import Artista
 
 @require_POST
 def cadastrar_artista(request):
-    artista = Artista.objects.create(nome=request.POST['nome'])
+    nome = request.POST.get('nome', '')
+    if not nome.strip():
+        return HttpResponseBadRequest('Informe o nome do artista.')
+
+    artista = Artista.objects.create(nome=nome)
     return redirect('consultar_artista', pk=artista.pk)
 
 

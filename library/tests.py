@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from config.settings import LANGUAGE_CODE
 
+from .models import Artista
+
 
 class TestLanguageSystem(TestCase):
     def test_language_pt_br(self):
@@ -10,6 +12,34 @@ class TestLanguageSystem(TestCase):
 
 
 class CadastroArtistaTests(TestCase):
+    def test_cadastro_rejeita_nome_invalido_sem_alterar_registros(self):
+        Artista.objects.create(nome='Iron Maiden')
+        registros_antes = list(Artista.objects.values_list('pk', 'nome'))
+        # Permite verificar a resposta mesmo se a view causar um erro no servidor.
+        cliente = Client(raise_request_exception=False)
+        url_cadastro = reverse('cadastrar_artista')
+
+        casos = (
+            ('ausente', {}),
+            ('vazio', {'nome': ''}),
+            ('somente espaços', {'nome': '   '}),
+        )
+
+        for caso, dados in casos:
+            with self.subTest(nome=caso):
+                resposta = cliente.post(url_cadastro, dados)
+
+                self.assertContains(
+                    resposta,
+                    'Informe o nome do artista.',
+                    status_code=400,
+                )
+                self.assertEqual(
+                    list(Artista.objects.values_list('pk', 'nome')),
+                    registros_antes,
+                    'Um cadastro inválido deve preservar todos os registros.',
+                )
+
     def test_cadastro_valido_permite_consultar_artista_sem_albuns(self):
         resposta = self.client.post(reverse('cadastrar_artista'), {'nome': 'Iron Maiden'})
 
