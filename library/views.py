@@ -1,8 +1,17 @@
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from rest_framework import permissions, viewsets
+
+from library.serializers import ArtistaSerializer
 
 from .models import Artista
+
+
+class ArtistaViewSet(viewsets.ModelViewSet):
+    queryset = Artista.objects.all().order_by('nome')
+    serializer_class = ArtistaSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 @require_POST
