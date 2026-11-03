@@ -1,6 +1,7 @@
-# Music Library — decisões técnicas da B01
+# Music Library — decisões técnicas e evolução
 
 Data: 29/10/2026. Escolhas confirmadas pelo autor e registro autorizado nesta conversa.
+Atualização: 03/11/2026 — registro do cadastro e da API de artistas já integrados ao repositório.
 Referências: [B01 do backlog](BACKLOG.md#b01--escolher-tecnologias-interface-e-ambiente-local) e [requisitos](REQUIREMENTS.md).
 
 ## 1. Escolhas e justificativas
@@ -34,7 +35,7 @@ Estrutura prevista: `manage.py` na raiz; configurações em `config/`; modelos, 
 - **Transações:** agrupam alterações relacionadas para que sejam salvas integralmente ou desfeitas em falha. Usar `transaction.atomic()` nas operações que exigem essa proteção.
 - **Testes:** verificam regras e resultados observáveis, incluindo persistência e respostas da interface, com dados isolados da coleção pessoal.
 
-Não haverá contrato de API pública nesta etapa. A interface escolhida usa páginas renderizadas pelo servidor, sem aplicação frontend separada. Hospedagem, autenticação e acesso remoto exigem planejamento próprio antes de publicação.
+A interface escolhida na B01 usa páginas renderizadas pelo servidor, sem aplicação frontend separada. Posteriormente, foi acrescentada uma API local de artistas com Django REST Framework, detalhada na seção 6. Não foi definido um contrato de API pública. Hospedagem e acesso remoto, incluindo a revisão da autenticação e das permissões para publicação, exigem planejamento próprio.
 
 ## 3. Execução local
 
@@ -95,7 +96,7 @@ As restrições e transações são recursos disponíveis, não garantias autom�
 
 Na exploração da B01 foram observados Linux no WSL2, Python 3.12.3 e SQLite 3.45.1 acessível pelo Python. Os módulos `venv` e `pip` estavam disponíveis; Django não foi encontrado no interpretador consultado. Isso não comprova a criação de um ambiente virtual nem o funcionamento da aplicação.
 
-A pasta continha os documentos `IDEIA.md`, `REQUIREMENTS.md` e `BACKLOG.md`, sem repositório Git disponível. A B01 registra decisões; não inicializa Git, instala dependências, cria o projeto ou executa testes. Todos os cenários de produto acima permanecem planejados, sem comportamento implementado ou comprovado.
+A pasta continha os documentos `IDEIA.md`, `REQUIREMENTS.md` e `BACKLOG.md`, sem repositório Git disponível. A B01 registra decisões; não inicializa Git, instala dependências, cria o projeto ou executa testes. Naquele momento, todos os cenários de produto acima estavam planejados, sem comportamento implementado ou comprovado.
 
 ### B02 — ambiente verificado em 29/10/2026
 
@@ -105,6 +106,37 @@ A pasta continha os documentos `IDEIA.md`, `REQUIREMENTS.md` e `BACKLOG.md`, sem
 - **Evidência fornecida pelo autor:** saída de `python -B manage.py runserver 127.0.0.1:8000 --noreload` com inicialização, resposta HTTP 200 para `GET /` e encerramento por `Ctrl+C`. O servidor informou 18 migrações pendentes; depois, o autor forneceu a saída de `python manage.py migrate` com todas as 18 migrações internas aplicadas com sucesso.
 - **Limites:** o agente não executou o servidor nem as migrações locais; esses resultados foram conferidos pelas saídas enviadas pelo autor. Não foi demonstrado novo início do servidor após as migrações. A página inicial padrão e o teste de idioma não demonstram cadastro, persistência de artistas ou outros comportamentos de produto; esses cenários permanecem nas próximas tarefas.
 
-**Conclusão:** B01 e B02 concluídas. **Próxima tarefa:** B03, cadastrar artista. O autor continuará responsável por escrever testes e implementação com mentoria.
+**Conclusão da B02:** B01 e B02 concluídas; naquele momento, a próxima tarefa era B03, cadastrar artista. O progresso posterior está registrado abaixo. O autor continuará responsável por escrever testes e implementação com mentoria.
 
 Revisão breve de aprendizado: por que validar um nome antes de salvar não substitui uma restrição de unicidade no banco quando duas solicitações chegam simultaneamente?
+
+## 6. Cadastro e API de artistas — registro em 03/11/2026
+
+Registro baseado na leitura do código e do histórico local: o cadastro foi integrado pelo PR #2; a API foi integrada pelo PR #3, com o commit `37240d3` (`feat(artistas): adiciona API autenticada para gerenciar artistas`).
+
+### Estrutura implementada
+
+- `requirements.txt` declara `djangorestframework==3.18.3`, e `config/settings.py` registra `rest_framework` em `INSTALLED_APPS`. Isso registra a dependência no projeto; esta revisão não verificou sua instalação no ambiente.
+- `library/serializers.py` define `ArtistaSerializer`, baseado em `ModelSerializer`, com os campos `pk` e `nome`. O serializer representa os dados do modelo na API e participa da validação das entradas.
+- `library/views.py` define `ArtistaViewSet`, baseado em `ModelViewSet`, com consulta a todos os artistas ordenados por `nome`, serializer associado e permissão `IsAuthenticated`. O conjunto de operações da API exige usuário autenticado.
+- `config/urls.py` registra o recurso `artistas` em um `DefaultRouter`, que gera as rotas a partir do viewset.
+
+| Rota | Operações configuradas |
+| --- | --- |
+| `/api/artistas/` | Listar (`GET`) e cadastrar (`POST`) artistas. |
+| `/api/artistas/<pk>/` | Consultar (`GET`), substituir (`PUT`), editar parcialmente (`PATCH`) e excluir (`DELETE`) um artista. |
+| `/artistas/login/` e `/artistas/logout/` | Rotas de autenticação do Django REST Framework, incluídas sob `/artistas/`. |
+| `/artistas/novo/` | Cadastro por `POST` na view Django existente, com rejeição de nome ausente, vazio ou somente espaços. |
+| `/artistas/<pk>/` | Consulta pela página Django existente. |
+
+`pk` é o identificador do artista. As rotas Django existentes não receberam a permissão `IsAuthenticated` aplicada ao viewset. A autenticação da API não representa uma política de acesso global da aplicação.
+
+### Evidências e limites
+
+- Foram lidos modelo, serializer, views, rotas, configurações e testes existentes. `library/tests.py` contém testes de cadastro válido com consulta sem álbuns e rejeição de nomes inválidos pela view Django, além do teste de idioma. Esses testes não foram executados nesta atualização documental.
+- Não foram encontrados testes específicos da API em `library/tests.py`. A configuração das rotas e da permissão foi conferida por leitura; respostas HTTP, autenticação, validações e operações da API ainda precisam de verificação em execução.
+- O modelo `Artista` possui somente `nome`, sem restrição de unicidade. O serializer não acrescenta regras próprias de duplicatas. A ordenação atual usa `order_by('nome')`, sem tratamento explícito de capitalização. B04 e os critérios completos de B05 permanecem pendentes.
+- As operações de edição e exclusão oferecidas pelo viewset não comprovam a conclusão de B06 ou B27: ainda faltam evidências dos critérios correspondentes, incluindo validações, confirmação de exclusão e preservação de vínculos quando existirem.
+- Persistência após reinício e comportamento em falha de gravação da B03 não foram demonstrados nesta revisão. A API acrescentada não altera os critérios de aceitação dos requisitos.
+
+Revisão breve de aprendizado: qual é a diferença entre representar os campos com um serializer e restringir o acesso com `IsAuthenticated`?
