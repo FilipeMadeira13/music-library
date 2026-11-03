@@ -1,10 +1,11 @@
 # Music Library — backlog priorizado
 
 Data: 29/10/2026. Fonte de verdade: [REQUIREMENTS.md](REQUIREMENTS.md).
+Atualização: 03/11/2026 — progresso do cadastro e registro da API de artistas.
 
 **Decisão confirmada pelo autor: este será um projeto novo.** A comparação com o projeto anterior e a escolha entre evolução e nova versão estão resolvidas e não são tarefas pendentes. Essa decisão atualiza a premissa de planejamento, sem alterar os documentos de origem.
 
-Este backlog organiza o trabalho; as escolhas técnicas confirmadas na B01 estão registradas em [DECISOES.md](DECISOES.md). O registro não autoriza implementar funcionalidades, instalar ferramentas ou publicar a aplicação. As **B01 e B02 estão concluídas** e as outras **29 tarefas estão pendentes**. O teste mínimo de infraestrutura foi executado na B02; os testes de produto descritos permanecem **planejados**.
+Este backlog organiza o trabalho; as escolhas técnicas e sua evolução estão registradas em [DECISOES.md](DECISOES.md). O registro não autoriza implementar funcionalidades, instalar ferramentas ou publicar a aplicação. As **B01 e B02 estão concluídas**, a **B03 está em andamento** e as outras **28 tarefas estão pendentes**. Há implementação e testes de cadastro no repositório, além de uma API de artistas; a atualização de 03/11/2026 foi documental, sem execução desses testes nem comprovação dos critérios restantes.
 
 ## 1. Prioridades, dependências e forma de trabalho
 
@@ -20,6 +21,8 @@ As dependências indicam pré-requisitos de conclusão. Dentro de cada bloco, se
 Executar uma tarefa por vez com mentoria: o autor escreve testes e implementação, preferindo TDD — teste que falha, implementação mínima e melhoria da organização. Apresentar evidências e aguardar a decisão do autor antes da próxima tarefa. Se uma tarefa não couber em um ciclo curto de trabalho, subdividi-la preservando seus critérios e referências; não retirar testes para reduzir tamanho.
 
 Disponibilidade de referência: 10 horas semanais, sem prazo definido. Não há estimativas de calendário aprovadas. O fluxo principal continua sendo **Biblioteca → Artista → Álbuns agrupados por tipo → Detalhes do álbum**. A interface escolhida na B01 usa navegador local, templates Django, HTML e CSS simples, conforme [DECISOES.md](DECISOES.md).
+
+**Evolução técnica registrada em 03/11/2026:** foi integrada uma API local de artistas com Django REST Framework, serializer com `pk` e `nome`, operações em `/api/artistas/` e `/api/artistas/<pk>/` e permissão `IsAuthenticated`. Estrutura, rotas e limites estão na [seção 6 de DECISOES.md](DECISOES.md#6-cadastro-e-api-de-artistas--registro-em-03112026). A presença de listagem, edição e exclusão no viewset não conclui B05, B06 ou B27; seus critérios continuam pendentes, assim como os testes específicos da API.
 
 ### Critérios comuns de conclusão
 
@@ -61,11 +64,12 @@ Aplicar a cada tarefa de produto, além de seus critérios específicos:
 
 ### B03 — Cadastrar artista
 
-- **Estado / prioridade:** Pendente / P1.
+- **Estado / prioridade:** Em andamento; implementação parcial e testes presentes, com critérios ainda sem comprovação / P1.
 - **Objetivo:** salvar um artista manualmente, mesmo sem álbuns.
 - **Dependências:** B02.
 - **Aceitação:** aceitar nome válido; permitir consultar o artista criado; rejeitar nome ausente, vazio ou somente espaços com explicação e sem alteração de registros. Persistir o cadastro.
 - **Testes planejados:** cadastro válido e consulta sem álbuns; entradas inválidas; reinício; falha de gravação sem sucesso falso. A listagem completa é B05 e o bloqueio de duplicatas é B04; esta fatia isolada ainda não conclui RF-01.
+- **Progresso observado em 03/11/2026:** modelo `Artista`, view de cadastro por `POST`, redirecionamento para consulta e template com estado sem álbuns; `library/tests.py` contém testes para cadastro válido e rejeição de nome ausente, vazio ou somente espaços sem alterar registros. A API acrescenta outra entrada de cadastro, ainda sem testes específicos identificados. Esta atualização não executou testes; persistência após reinício e falha de gravação permanecem sem evidência registrada.
 - **Risco principal:** aceitar dados inválidos ou apresentar cadastro que não foi salvo.
 - **Referências:** RF-01; RN-04; RNF-01, RNF-02, RNF-03; CA-01, CA-14, CA-15.
 
@@ -431,6 +435,6 @@ As relações abaixo indicam onde o comportamento será entregue ou verificado; 
 
 ## 10. Próxima ação e revisão de aprendizado
 
-**Próxima tarefa sugerida: B03 — cadastrar artista.** O ambiente mínimo foi verificado na B02. Começar pelo teste de cadastro válido, respeitando os critérios da B03 e a mentoria em pequenas etapas; o autor escreve testes e implementação. A conclusão da preparação não comprova funcionalidades de produto.
+**Próxima etapa sugerida: revisar as evidências restantes da B03.** O cadastro e seus testes iniciais já estão no repositório. Conferir a execução dos testes existentes e demonstrar persistência após reinício e comportamento em falha de gravação antes de concluir a tarefa. A API também precisa de verificação específica de autenticação, validações e operações expostas. O autor escreve testes e implementação com mentoria; esta atualização documental não executa nem autoriza automaticamente a próxima etapa.
 
 Ao final de cada ciclo, explicar com as próprias palavras: qual regra foi protegida por um teste, qual resultado comprova isso e qual dependência permite escolher a tarefa seguinte? A revisão apoia o aprendizado e não condiciona a entrega documental deste backlog.
