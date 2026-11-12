@@ -8,7 +8,7 @@ Planejamento elaborado em 12/11/2026 a partir de [REQUIREMENTS.md](REQUIREMENTS.
 - **Estado inicial do planejamento:** na elaboração deste plano, o diretório continha apenas `REQUIREMENTS.md`; ainda não havia implementação, ferramentas de teste ou repositório Git inicializado. A ausência de Git não autorizava inicializá-lo naquela etapa.
 - **Decisões da solução:** no início do planejamento, tecnologias, local de armazenamento e formato técnico da cópia estavam em aberto. As tecnologias e o armazenamento foram definidos na BL-01, em [SOLUTION.md](SOLUTION.md); o contrato da cópia foi definido na BL-02, em [BACKUP_FORMAT.md](BACKUP_FORMAT.md), com as decisões de validação confirmadas pelo usuário e sem ampliar o escopo do MVP.
 - **Ambiente aprovado:** navegador em computador, no próprio perfil, uma sessão por vez; Chrome e Firefox estáveis no momento da verificação, sem custos recorrentes obrigatórios.
-- **Estado das entregas:** BL-01 e BL-02 concluídas por revisão documental. A aplicação ainda não foi implementada nem testada; os testes funcionais descritos são verificações futuras. As conferências documentais executadas estão registradas nas decisões correspondentes.
+- **Estado das entregas:** BL-01 e BL-02 concluídas por revisão documental; BL-03 concluída com execução local, testes das páginas iniciais e verificação de navegação no Chrome. Os fluxos da coleção ainda não foram implementados nem verificados; suas evidências pertencem às tarefas seguintes.
 - **Ritmo:** uma microtarefa por vez, sem prazo fixo. Não há estimativas de duração enquanto as tecnologias e o ambiente de trabalho não forem escolhidos.
 
 ## 2. MVP, melhorias e exclusões
@@ -59,12 +59,30 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-03 — Preparar uma execução local verificável
 
-- [ ] Concluída
+- [x] Concluída
+- **Estado:** estrutura inicial implementada e verificada em 12/11/2026 na branch `feat/bl-03-execucao-local`. Preparação e comandos de uso documentados no [README.md](../README.md).
 - **Objetivo:** conseguir abrir a aplicação no ambiente escolhido e executar uma primeira verificação útil.
 - **Dependências:** BL-01.
 - **Critérios de aceitação:** documentar os comandos mínimos para executar e verificar o projeto; abrir a estrutura inicial em português, com acesso ao início do cadastro; preparar apenas as ferramentas necessárias. Obter aprovação antes de instalações, configurações ou mudanças no Git que venham a ser necessárias.
 - **Testes/evidência:** executar o comando documentado e uma verificação de abertura da aplicação; registrar o resultado e o ambiente. Essa abertura não comprova persistência nem os fluxos do MVP.
 - **Riscos:** instalar ferramentas sem necessidade; depender de configuração não documentada; gerar funcionalidades fora do escopo.
+
+**Evidências da execução:**
+
+| Verificação | Resultado observado |
+| --- | --- |
+| Ambiente | Ubuntu 24.04.3 LTS, Linux x86_64; Python 3.12.3; SQLite 3.45.1; Google Chrome 146.0.7680.164. |
+| Preparação | `.venv` criada; Django 5.2.19, DRF 3.18.3, asgiref 3.13.0 e sqlparse 0.6.1 instalados; versões fixadas em `requirements.txt`. |
+| Banco | `python manage.py migrate` aplicou as migrações iniciais do Django em `BASE_DIR / "db.sqlite3"`. Nenhum modelo de álbum foi criado. |
+| RED | `python manage.py test --verbosity 2`: dois testes falharam com `404 != 200` antes de implementar as rotas. |
+| GREEN | O mesmo comando passou com dois testes `SimpleTestCase`: HTML, idioma, títulos e links das duas páginas. O runner informou que o banco não foi utilizado. |
+| Configuração e dependências | `python manage.py check`: nenhuma ocorrência; `python -m pip check`: nenhuma dependência incompatível. |
+| Abertura | `python manage.py runserver 127.0.0.1:8000` iniciou o servidor local. As páginas `/` e `/albuns/novo/` responderam HTTP 200. |
+| Navegação no Chrome | Automação via Chrome DevTools Protocol em modo headless, com perfil temporário: início → cadastro → início usando Tab/Enter. O cadastro mostrou “Cadastro em preparação”. |
+| Foco e apresentação | Nos dois links, `:focus-visible` ativo e contorno sólido de 3 px; capturas das páginas inspecionadas em viewport de 1280 × 800. |
+| Arquivos locais | Conferido com `git check-ignore` que `.venv`, banco SQLite, arquivos auxiliares e `.env` ficam fora do versionamento. A chave é recebida por `DJANGO_SECRET_KEY`. |
+
+**Limites da evidência:** verificação de navegador automatizada, sem avaliação manual por uma pessoa. Firefox não foi verificado. A execução local e as migrações iniciais não comprovam cadastro, leitura da coleção, persistência de álbuns, proteção dos futuros formulários POST ou capacidade de 10.000 álbuns. Esses comportamentos permanecem nas tarefas correspondentes.
 
 ## 5. P1 — Primeira coleção persistida com segurança
 
@@ -400,8 +418,8 @@ Rastreabilidade é a ligação entre um requisito e a tarefa que o entrega ou ve
 
 ## 13. Próxima ação e revisão ativa
 
-**Próxima microtarefa recomendada: BL-03.** Com a BL-01 e a BL-02 concluídas documentalmente em [SOLUTION.md](SOLUTION.md) e [BACKUP_FORMAT.md](BACKUP_FORMAT.md), o próximo passo recomendado é preparar uma execução local verificável. As decisões documentais não comprovam o funcionamento da aplicação.
+**Próxima microtarefa recomendada: BL-04.** Com as decisões BL-01/BL-02 e a execução inicial da BL-03 verificadas, o próximo passo recomendado é cadastrar um álbum válido e recuperá-lo ao reabrir. As páginas introdutórias não comprovam os fluxos da coleção.
 
-**Decisão que cabe ao usuário:** escolher iniciar BL-03 ou outro item já desbloqueado. Não iniciar outra tarefa, instalar ferramentas ou alterar o Git automaticamente após esta conclusão documental.
+**Decisão que cabe ao usuário:** escolher iniciar BL-04 ou outro item já desbloqueado. A conclusão da BL-03 não inicia automaticamente outra tarefa nem autoriza mudanças adicionais no Git.
 
-**Revisão ativa:** por que uma cópia vazia é válida e, mesmo assim, sua restauração precisa de confirmação explícita antes de substituir a coleção atual?
+**Revisão ativa:** por que uma resposta HTTP 200 e dois testes `SimpleTestCase` passando ainda não demonstram que um álbum foi salvo e pode ser recuperado ao reabrir?
