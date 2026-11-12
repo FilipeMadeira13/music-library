@@ -6,9 +6,9 @@ Planejamento elaborado em 12/11/2026 a partir de [REQUIREMENTS.md](REQUIREMENTS.
 
 - **Objetivo:** construir uma biblioteca pessoal que ajude a reencontrar álbuns e escolher o que ouvir.
 - **Estado inicial do planejamento:** na elaboração deste plano, o diretório continha apenas `REQUIREMENTS.md`; ainda não havia implementação, ferramentas de teste ou repositório Git inicializado. A ausência de Git não autorizava inicializá-lo naquela etapa.
-- **Decisões da solução:** no início do planejamento, tecnologias, local de armazenamento e formato técnico da cópia estavam em aberto. As tecnologias e o armazenamento foram definidos na BL-01, em [SOLUTION.md](SOLUTION.md); o formato da cópia permanece para a BL-02, sem modificar os requisitos.
+- **Decisões da solução:** no início do planejamento, tecnologias, local de armazenamento e formato técnico da cópia estavam em aberto. As tecnologias e o armazenamento foram definidos na BL-01, em [SOLUTION.md](SOLUTION.md); o contrato da cópia foi definido na BL-02, em [BACKUP_FORMAT.md](BACKUP_FORMAT.md), com as decisões de validação confirmadas pelo usuário e sem ampliar o escopo do MVP.
 - **Ambiente aprovado:** navegador em computador, no próprio perfil, uma sessão por vez; Chrome e Firefox estáveis no momento da verificação, sem custos recorrentes obrigatórios.
-- **Escopo desta entrega:** planejar. Nenhuma tarefa abaixo foi implementada ou testada. Os testes descritos são verificações futuras, não evidências de execução.
+- **Estado das entregas:** BL-01 e BL-02 concluídas por revisão documental. A aplicação ainda não foi implementada nem testada; os testes funcionais descritos são verificações futuras. As conferências documentais executadas estão registradas nas decisões correspondentes.
 - **Ritmo:** uma microtarefa por vez, sem prazo fixo. Não há estimativas de duração enquanto as tecnologias e o ambiente de trabalho não forem escolhidos.
 
 ## 2. MVP, melhorias e exclusões
@@ -49,7 +49,8 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-02 — Definir o contrato do arquivo de cópia
 
-- [ ] Concluída
+- [x] Concluída
+- **Estado:** contrato definido e revisado em [BACKUP_FORMAT.md](BACKUP_FORMAT.md), em 12/11/2026. Conferidas a sintaxe dos cinco exemplos JSON e, por revisão documental, as regras e a correspondência com CA-26 a CA-31 e o caso de cópia vazia. Exportação, validação e restauração ainda dependem de implementação e testes nas tarefas correspondentes.
 - **Objetivo:** descrever o que torna um arquivo próprio válido para exportação e restauração.
 - **Dependências:** BL-01.
 - **Critérios de aceitação:** definir estrutura, identificação do formato e política para formatos incompatíveis; representar título, artista e situação de todos os registros e uma coleção vazia; prever validação integral de limites, valores e duplicatas; deixar explícito que restaurar substitui, sem mesclar. Preservar a grafia de exibição prevista nos requisitos. Não adicionar campos de produto nem exigir recursos não aprovados.
@@ -399,8 +400,8 @@ Rastreabilidade é a ligação entre um requisito e a tarefa que o entrega ou ve
 
 ## 13. Próxima ação e revisão ativa
 
-**Próximas microtarefas desbloqueadas: BL-02 e BL-03.** Com a BL-01 concluída e a decisão registrada em [SOLUTION.md](SOLUTION.md), já é possível definir o contrato do arquivo de cópia (BL-02) ou preparar uma execução local verificável (BL-03). Ambas dependem apenas da BL-01 e podem ser escolhidas separadamente.
+**Próxima microtarefa recomendada: BL-03.** Com a BL-01 e a BL-02 concluídas documentalmente em [SOLUTION.md](SOLUTION.md) e [BACKUP_FORMAT.md](BACKUP_FORMAT.md), o próximo passo recomendado é preparar uma execução local verificável. As decisões documentais não comprovam o funcionamento da aplicação.
 
-**Decisão que cabe ao usuário:** escolher BL-02, BL-03 ou outro item já desbloqueado. Não iniciar a tarefa escolhida, instalar ferramentas ou alterar o Git automaticamente após esta correção documental.
+**Decisão que cabe ao usuário:** escolher iniciar BL-03 ou outro item já desbloqueado. Não iniciar outra tarefa, instalar ferramentas ou alterar o Git automaticamente após esta conclusão documental.
 
-**Revisão ativa:** por que consulta, edição e restauração precisam ter testes de falha próprios, mesmo quando o cadastro já consegue salvar e recuperar um álbum?
+**Revisão ativa:** por que uma cópia vazia é válida e, mesmo assim, sua restauração precisa de confirmação explícita antes de substituir a coleção atual?
