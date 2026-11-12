@@ -5,8 +5,8 @@ Planejamento elaborado em 12/11/2026 a partir de [REQUIREMENTS.md](REQUIREMENTS.
 ## 1. Base do plano e limites
 
 - **Objetivo:** construir uma biblioteca pessoal que ajude a reencontrar álbuns e escolher o que ouvir.
-- **Estado observado:** o diretório contém apenas `REQUIREMENTS.md`; não há implementação, ferramentas de teste ou repositório Git inicializado. A ausência de Git não autoriza inicializá-lo nesta entrega.
-- **Decisões em aberto para a solução:** tecnologias, local de armazenamento e formato técnico da cópia. BL-01 e BL-02 resolvem essas escolhas sem modificar os requisitos.
+- **Estado inicial do planejamento:** na elaboração deste plano, o diretório continha apenas `REQUIREMENTS.md`; ainda não havia implementação, ferramentas de teste ou repositório Git inicializado. A ausência de Git não autorizava inicializá-lo naquela etapa.
+- **Decisões da solução:** no início do planejamento, tecnologias, local de armazenamento e formato técnico da cópia estavam em aberto. As tecnologias e o armazenamento foram definidos na BL-01, em [SOLUTION.md](SOLUTION.md); o formato da cópia permanece para a BL-02, sem modificar os requisitos.
 - **Ambiente aprovado:** navegador em computador, no próprio perfil, uma sessão por vez; Chrome e Firefox estáveis no momento da verificação, sem custos recorrentes obrigatórios.
 - **Escopo desta entrega:** planejar. Nenhuma tarefa abaixo foi implementada ou testada. Os testes descritos são verificações futuras, não evidências de execução.
 - **Ritmo:** uma microtarefa por vez, sem prazo fixo. Não há estimativas de duração enquanto as tecnologias e o ambiente de trabalho não forem escolhidos.
@@ -39,6 +39,8 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-01 — Escolher a solução mínima e o armazenamento
 
+- [x] Concluída
+- **Estado:** decisão documental registrada e revisada em [SOLUTION.md](SOLUTION.md), em 12/11/2026. As verificações de implementação, falhas e capacidade permanecem nas tarefas correspondentes.
 - **Objetivo:** registrar uma decisão curta que permita começar sem comprometer a preservação dos dados.
 - **Dependências:** nenhuma.
 - **Critérios de aceitação:** escolher as tecnologias e o armazenamento com justificativa para uso no navegador, uma sessão, ausência de conta e custos recorrentes obrigatórios; explicar como distinguir coleção vazia de falha de leitura e como salvar ou substituir a coleção integralmente, sem deixar alterações parciais; identificar restrições de espaço e compatibilidade que precisarão de comprovação com 10.000 álbuns.
@@ -47,6 +49,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-02 — Definir o contrato do arquivo de cópia
 
+- [ ] Concluída
 - **Objetivo:** descrever o que torna um arquivo próprio válido para exportação e restauração.
 - **Dependências:** BL-01.
 - **Critérios de aceitação:** definir estrutura, identificação do formato e política para formatos incompatíveis; representar título, artista e situação de todos os registros e uma coleção vazia; prever validação integral de limites, valores e duplicatas; deixar explícito que restaurar substitui, sem mesclar. Preservar a grafia de exibição prevista nos requisitos. Não adicionar campos de produto nem exigir recursos não aprovados.
@@ -55,6 +58,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-03 — Preparar uma execução local verificável
 
+- [ ] Concluída
 - **Objetivo:** conseguir abrir a aplicação no ambiente escolhido e executar uma primeira verificação útil.
 - **Dependências:** BL-01.
 - **Critérios de aceitação:** documentar os comandos mínimos para executar e verificar o projeto; abrir a estrutura inicial em português, com acesso ao início do cadastro; preparar apenas as ferramentas necessárias. Obter aprovação antes de instalações, configurações ou mudanças no Git que venham a ser necessárias.
@@ -65,6 +69,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-04 — Cadastrar um álbum válido e recuperá-lo ao reabrir
 
+- [ ] Concluída
 - **Objetivo:** completar a primeira fatia vertical: formulário, gravação e visualização do álbum após reabertura.
 - **Dependências:** BL-03.
 - **Critérios de aceitação:** informar título, artista e uma das duas situações; retirar espaços nas pontas de título e artista, preservando a grafia restante; confirmar somente após salvar; mostrar os valores salvos e recuperá-los ao encerrar e reabrir no mesmo ambiente.
@@ -73,6 +78,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-05 — Rejeitar campos inválidos e acima do limite no cadastro
 
+- [ ] Concluída
 - **Objetivo:** impedir registros incompletos e explicar como corrigir cada entrada.
 - **Dependências:** BL-04.
 - **Critérios de aceitação:** rejeitar título/artista ausente, vazio ou só com espaços; rejeitar situação diferente de `quero ouvir` e `já ouvi`; aceitar textos válidos de 200 caracteres e rejeitar 201 sem truncar nem criar registros parciais; identificar o campo e o limite em português.
@@ -81,6 +87,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-06 — Bloquear duplicatas usando a comparação aprovada
 
+- [ ] Concluída
 - **Objetivo:** impedir álbuns equivalentes sem impedir o mesmo título com outro artista.
 - **Dependências:** BL-05.
 - **Critérios de aceitação:** comparar título e artista ignorando caixa, acentos, espaços nas pontas e espaços internos excedentes; bloquear o par equivalente independentemente da situação; permitir mesmo título com artista diferente. Usar a mesma regra nas futuras consultas, edições e restaurações, sem alterar a grafia exibida além da remoção de espaços nas pontas.
@@ -89,6 +96,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-07 — Distinguir biblioteca vazia de falha de leitura
 
+- [ ] Concluída
 - **Objetivo:** abrir uma coleção nova sem colocar dados inacessíveis em risco.
 - **Dependências:** BL-04.
 - **Critérios de aceitação:** quando não houver registros, informar a ausência e permitir cadastrar; quando a leitura de uma coleção falhar, apresentar erro distinto e não sobrescrever os dados como se estivessem vazios. Nenhuma gravação pode partir da suposição de que a leitura malsucedida representa uma coleção vazia.
@@ -97,6 +105,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-08 — Preservar a coleção em falha de cadastro
 
+- [ ] Concluída
 - **Objetivo:** tornar observável a diferença entre cadastro salvo e tentativa que falhou.
 - **Dependências:** BL-04.
 - **Critérios de aceitação:** se a gravação falhar, informar que o álbum não foi salvo; não confirmar sucesso nem deixar registro parcial; manter os registros previamente confirmados, inclusive ao reabrir.
@@ -107,6 +116,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-09 — Organizar e selecionar álbuns por artista
 
+- [ ] Concluída
 - **Objetivo:** reencontrar a coleção de um artista.
 - **Dependências:** BL-06, BL-07.
 - **Critérios de aceitação:** identificar os grupos por artista, títulos e situações; reunir nomes equivalentes pela normalização aprovada; selecionar um artista ou todos; tratar um nome composto, como `Artista A e Artista B`, como um agrupamento próprio, sem separar participantes.
@@ -115,6 +125,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-10 — Buscar por trecho do título
 
+- [ ] Concluída
 - **Objetivo:** localizar um álbum mesmo sem lembrar seu título completo.
 - **Dependências:** BL-09.
 - **Critérios de aceitação:** usar a normalização aprovada e correspondência parcial; aceitar busca de até 200 caracteres; rejeitar 201 sem aplicar a busca excedente ou truncar; apagar a busca ou informar só espaços retira apenas essa restrição; ausência de correspondências tem mensagem própria e preserva a coleção.
@@ -123,6 +134,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-11 — Filtrar por situação de escuta
 
+- [ ] Concluída
 - **Objetivo:** escolher entre álbuns que quer ouvir, já ouviu ou ambos.
 - **Dependências:** BL-09.
 - **Critérios de aceitação:** permitir `quero ouvir`, `já ouvi` e todas; respeitar o artista selecionado; voltar a todas remove apenas a restrição de situação. Filtrar nunca altera a situação dos registros.
@@ -131,6 +143,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-12 — Combinar artista, busca e situação
 
+- [ ] Concluída
 - **Objetivo:** fazer a consulta representar exatamente todas as restrições ativas.
 - **Dependências:** BL-10, BL-11.
 - **Critérios de aceitação:** usar interseção: o álbum precisa atender a cada restrição ativa; sem restrições, incluir toda a biblioteca; retirar uma restrição preserva as outras; diferenciar ausência de resultados de ausência de registros.
@@ -139,6 +152,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-13 — Sortear um álbum da consulta atual
 
+- [ ] Concluída
 - **Objetivo:** obter uma escolha aleatória coerente com o que está sendo consultado.
 - **Dependências:** BL-12.
 - **Critérios de aceitação:** retornar um único elegível com título, artista e situação; sem restrições, considerar toda a biblioteca; com um elegível, retornar esse álbum; sem elegíveis, informar a ausência sem apresentar resultado anterior como novo. Não alterar registros; permitir repetição; dar a cada elegível a mesma chance em sorteios independentes.
@@ -147,6 +161,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-14 — Editar os dados de um álbum e persistir a alteração
 
+- [ ] Concluída
 - **Objetivo:** corrigir título, artista ou situação sem afetar os demais álbuns.
 - **Dependências:** BL-06, BL-09.
 - **Critérios de aceitação:** aplicar as validações e os limites do cadastro; verificar duplicatas ignorando o próprio registro; permitir salvar sem mudanças; atualizar somente o escolhido após a gravação; manter os dados anteriores se a entrada for inválida ou duplicar outro álbum; recuperar a edição após reabertura.
@@ -155,6 +170,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-15 — Atualizar consulta e elegíveis após uma edição
 
+- [ ] Concluída
 - **Objetivo:** refletir imediatamente a mudança de título, artista ou situação na consulta e nos próximos sorteios.
 - **Dependências:** BL-13, BL-14.
 - **Critérios de aceitação:** remover dos resultados um álbum que deixou de atender aos filtros, preservando-o na coleção; atualizar agrupamento e correspondência de título; próximos sorteios usam os dados salvos atuais. Não manter um resultado antigo apresentado como um novo sorteio válido.
@@ -163,6 +179,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-16 — Preservar os dados em falha de edição
 
+- [ ] Concluída
 - **Objetivo:** impedir que uma correção malsucedida substitua o último estado confirmado.
 - **Dependências:** BL-08, BL-14.
 - **Critérios de aceitação:** uma falha de gravação não confirma edição nem altera o álbum persistido ou os demais registros; informar que a operação não foi salva e recuperar os valores anteriores ao reabrir.
@@ -173,6 +190,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-17 — Exportar a coleção completa
 
+- [ ] Concluída
 - **Objetivo:** gerar uma cópia manual dos dados salvos, inclusive de uma biblioteca vazia.
 - **Dependências:** BL-02, BL-07.
 - **Critérios de aceitação:** gerar um arquivo no formato próprio com todos os títulos, artistas e situações salvos, mesmo com filtros ativos; disponibilizá-lo sem alterar a coleção; confirmar a exportação somente após a geração. Uma coleção vazia produz uma cópia válida, não uma falha.
@@ -181,6 +199,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-18 — Comunicar falhas de exportação sem cópia parcial
 
+- [ ] Concluída
 - **Objetivo:** impedir que um arquivo incompleto pareça uma recuperação confiável.
 - **Dependências:** BL-17.
 - **Critérios de aceitação:** se a leitura completa ou a geração do arquivo falhar, informar que a cópia não foi concluída; não confirmar sucesso, não apresentar cópia parcial como completa e preservar a coleção.
@@ -189,6 +208,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-19 — Validar todo o arquivo antes de permitir restauração
 
+- [ ] Concluída
 - **Objetivo:** distinguir uma cópia íntegra de um arquivo que deve ser rejeitado por completo.
 - **Dependências:** BL-02, BL-06, BL-07.
 - **Critérios de aceitação:** selecionar e ler o arquivo próprio; validar formato, todos os registros, campos, situações, limites e duplicatas internas conforme RN-07; aceitar coleção vazia válida; informar o motivo da rejeição sem gravar nada. Não comparar com a coleção atual para impedir duplicatas entre coleções, pois a operação futura será de substituição, não mesclagem.
@@ -197,6 +217,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-20 — Restaurar após confirmação ou cancelar sem mudanças
 
+- [ ] Concluída
 - **Objetivo:** recuperar exatamente a cópia escolhida, com uma decisão explícita antes de substituir os dados.
 - **Dependências:** BL-08, BL-17, BL-19.
 - **Critérios de aceitação:** só após validação completa, avisar que toda a coleção atual será substituída; exigir confirmação antes de gravar; cancelar preserva a coleção e não confirma restauração; confirmar uma cópia válida substitui integralmente os registros, sem mesclar, e só informa sucesso após salvar. A coleção restaurada deve reaparecer após reabertura. A mesma confirmação é obrigatória para uma cópia vazia.
@@ -205,6 +226,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-21 — Preservar a coleção inteira em falha de restauração
 
+- [ ] Concluída
 - **Objetivo:** garantir substituição integral ou preservação integral do último estado confirmado.
 - **Dependências:** BL-20.
 - **Critérios de aceitação:** uma falha de gravação após confirmar uma cópia válida informa que a restauração não foi salva; não confirma sucesso nem deixa a coleção parcialmente substituída; mantém todos os dados anteriores, inclusive após reabertura.
@@ -215,6 +237,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-22 — Verificar texto seguro em todos os caminhos de entrada
 
+- [ ] Concluída
 - **Objetivo:** comprovar que dados da biblioteca não são executados como código.
 - **Dependências:** BL-15, BL-18, BL-21.
 - **Critérios de aceitação:** título, artista e busca permanecem texto no cadastro, consulta, edição e sorteio; texto vindo de restauração segue o mesmo tratamento; exportar e restaurar preserva os valores válidos sem executá-los. Corrigir eventuais pontos que escapem ao tratamento já adotado nas tarefas anteriores.
@@ -223,6 +246,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-23 — Verificar teclado e mensagens nos fluxos da biblioteca
 
+- [ ] Concluída
 - **Objetivo:** concluir cadastro, consulta, filtros, sorteio e edição com comunicação compreensível e acesso por teclado.
 - **Dependências:** BL-15, BL-16.
 - **Critérios de aceitação:** percorrer e concluir os fluxos nos dois navegadores suportados; cancelar quando aplicável; manter foco visível, campos com rótulos e contraste legível; validação, sucesso, ausência de resultados e falhas usam texto em português, sem depender apenas de cor. Corrigir os problemas encontrados.
@@ -231,6 +255,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-24 — Verificar teclado e mensagens na cópia e recuperação
 
+- [ ] Concluída
 - **Objetivo:** tornar exportação e restauração completas acessíveis também sem mouse.
 - **Dependências:** BL-18, BL-21.
 - **Critérios de aceitação:** selecionar arquivo, entender a validação e o aviso de substituição, confirmar ou cancelar e compreender sucesso ou falha por teclado; manter foco visível, rótulos, contraste e mensagens em português independentes de cor, nos dois navegadores. Corrigir os problemas encontrados.
@@ -239,6 +264,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-25 — Preparar dados reproduzíveis para verificar a capacidade
 
+- [ ] Concluída
 - **Objetivo:** dispor de uma coleção sintética válida para testar 10.000 álbuns sem usar dados pessoais.
 - **Dependências:** BL-02, BL-06.
 - **Critérios de aceitação:** preparar dados de teste reproduzíveis com diferentes artistas e situações, títulos válidos e sem duplicatas normalizadas; permitir começar com 9.999 e cadastrar o próximo para atingir 10.000; permitir conferir a coleção completa antes e depois das operações. A preparação pertence aos testes e não adiciona importação externa ao produto.
@@ -247,6 +273,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-26 — Verificar as operações com 10.000 álbuns no Chrome
 
+- [ ] Concluída
 - **Objetivo:** comprovar a capacidade aprovada no Chrome estável do momento da verificação.
 - **Dependências:** BL-16, BL-22, BL-23, BL-24, BL-25.
 - **Critérios de aceitação:** cadastrar até atingir 10.000, consultar, buscar, combinar filtros, sortear, editar, reabrir, exportar e restaurar, atendendo aos critérios correspondentes; preservar dados e elegibilidade. Não criar rejeição automática acima de 10.000 nem inventar um tempo máximo de resposta como requisito.
@@ -255,6 +282,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-27 — Verificar as operações com 10.000 álbuns no Firefox
 
+- [ ] Concluída
 - **Objetivo:** comprovar a capacidade aprovada de forma independente no Firefox estável do momento da verificação.
 - **Dependências:** BL-16, BL-22, BL-23, BL-24, BL-25.
 - **Critérios de aceitação:** cumprir o mesmo conjunto de operações e condições de BL-26 no Firefox, incluindo cadastro até 10.000, reabertura e recuperação; não introduzir limite artificial de quantidade nem meta numérica de velocidade.
@@ -263,6 +291,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-28 — Consolidar as evidências técnicas e liberar a avaliação de uso
 
+- [ ] Concluída
 - **Objetivo:** verificar que o núcleo completo pode ser avaliado com dados reais sem confundir planejamento com comprovação.
 - **Dependências:** BL-26, BL-27.
 - **Critérios de aceitação:** relacionar CA-01 a CA-33 aos resultados reais; conferir RN-01 a RN-14 e RNF-01 a RNF-08, incluindo ausência de conta, autenticação, APIs de streaming e custos recorrentes obrigatórios; registrar limitações e pendências. Só iniciar a avaliação quando os critérios técnicos obrigatórios estiverem atendidos; não declarar o MVP concluído antes da avaliação de utilidade.
@@ -273,6 +302,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-29 — Reunir os 20 álbuns reais para avaliação
 
+- [ ] Concluída
 - **Objetivo:** preparar a amostra aprovada para observar o uso cotidiano.
 - **Dependências:** nenhuma; pode ser antecipada enquanto as decisões técnicas são trabalhadas.
 - **Critérios de aceitação:** o usuário escolhe 20 álbuns reais com diferentes artistas e situações e reúne título, artista e situação; a seleção não exige integração com streaming nem publicação dos dados.
@@ -281,6 +311,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-30 — Usar a biblioteca durante uma semana e registrar dificuldades
 
+- [ ] Concluída
 - **Objetivo:** observar se o MVP ajuda a reencontrar álbuns e decidir o que ouvir.
 - **Dependências:** BL-28, BL-29.
 - **Critérios de aceitação:** durante uma semana, usar os 20 álbuns para reencontrar por artista e trecho do título, consultar o que quer ouvir, sortear dentro do conjunto desejado e mudar situação com reabertura posterior; registrar dificuldades, exemplos concretos e situações em que precisou voltar à organização anterior. Usar registros breves ao longo da semana, sem impor uma quantidade diária de ações.
@@ -289,6 +320,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### BL-31 — Revisar o resultado e decidir o próximo ciclo
 
+- [ ] Concluída
 - **Objetivo:** encerrar o MVP com uma conclusão sustentada e uma próxima decisão do usuário.
 - **Dependências:** BL-30.
 - **Critérios de aceitação:** consolidar evidências técnicas e avaliação de utilidade; registrar se a biblioteca ajudou nos dois problemas, o que dificultou o uso e quais pendências existem; só considerar implementado se a definição de pronto de `REQUIREMENTS.md` estiver atendida. Pendências obrigatórias voltam para a tarefa correspondente; melhorias propostas precisam ser escolhidas antes de implementar.
@@ -299,6 +331,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### AD-01 — Refinar a inclusão de gênero
 
+- [ ] Concluída
 - **Objetivo:** especificar uma melhoria já prevista para depois do MVP, caso o usuário a priorize após observar o uso.
 - **Dependências:** BL-31 e escolha explícita dessa próxima etapa pelo usuário.
 - **Critérios de aceitação:** registrar os casos de uso, regras de preenchimento e consulta que o usuário confirmar; definir exemplos e o efeito nos dados existentes e nas cópias antes de criar tarefas de implementação. Não presumir taxonomia, múltiplos gêneros ou novo filtro sem decisão.
@@ -307,6 +340,7 @@ Os exemplos CA-01 a CA-33 e as regras de `REQUIREMENTS.md` são a fonte dos test
 
 ### AD-02 — Refinar ano/década de lançamento
 
+- [ ] Concluída
 - **Objetivo:** especificar como época ajudaria a reencontrar ou escolher álbuns, se o usuário priorizar essa melhoria.
 - **Dependências:** BL-31 e escolha explícita dessa próxima etapa pelo usuário; independente de AD-01.
 - **Critérios de aceitação:** decidir com o usuário quais dados de época informar, quais consultas serão úteis e como tratar dados desconhecidos e registros antigos; avaliar efeito nas cópias e definir critérios antes de planejar implementação. Não escolher automaticamente entre ano, década ou ambos.
@@ -365,8 +399,8 @@ Rastreabilidade é a ligação entre um requisito e a tarefa que o entrega ou ve
 
 ## 13. Próxima ação e revisão ativa
 
-**Próxima microtarefa sugerida: BL-01.** Escolher e justificar a solução mínima e o armazenamento, começando pelas garantias de leitura e gravação. Essa escolha orientará as tarefas de implementação; este documento não escolhe a tecnologia por antecipação.
+**Próximas microtarefas desbloqueadas: BL-02 e BL-03.** Com a BL-01 concluída e a decisão registrada em [SOLUTION.md](SOLUTION.md), já é possível definir o contrato do arquivo de cópia (BL-02) ou preparar uma execução local verificável (BL-03). Ambas dependem apenas da BL-01 e podem ser escolhidas separadamente.
 
-**Decisão que cabe ao usuário:** revisar a ordem e escolher BL-01 ou outro item já desbloqueado. Não iniciar implementação, instalar ferramentas ou alterar o Git automaticamente após a entrega deste planejamento.
+**Decisão que cabe ao usuário:** escolher BL-02, BL-03 ou outro item já desbloqueado. Não iniciar a tarefa escolhida, instalar ferramentas ou alterar o Git automaticamente após esta correção documental.
 
 **Revisão ativa:** por que consulta, edição e restauração precisam ter testes de falha próprios, mesmo quando o cadastro já consegue salvar e recuperar um álbum?
