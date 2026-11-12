@@ -1,0 +1,9 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block content %}
+<h1>Biblioteca de álbuns</h1>
+<p>Um lugar para organizar os álbuns que você quer ouvir ou já ouviu.</p>
+<nav aria-label="Ações da biblioteca">
+    <a href="{% url 'biblioteca:cadastro' %}">Cadastrar álbum</a>
+</nav>
+{% endblock %}
