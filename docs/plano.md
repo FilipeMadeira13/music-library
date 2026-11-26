@@ -1,14 +1,16 @@
 # Proposta técnica — music-library v1
 
 ## Context
-O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zero. Este plano traduz os requisitos em arquitetura, modelo de dados, contratos, estratégia de erros e uma sequência de commits pequenos. Nenhum código foi escrito.
+O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zero. Este plano traduz os requisitos em arquitetura, modelo de dados, contratos, estratégia de erros e uma sequência de commits pequenos.
+
+> **Status (2026-11-25):** as tarefas 1 e 2 foram entregues no commit `b85399a`. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito).
 
 ### Campos preenchidos (tirados do documento de requisitos)
 | Campo | Valor |
 |---|---|
 | LINGUAGEM | Python 3.12 |
 | FRAMEWORK | Django 5.2 LTS + Django REST Framework; frontend com templates Django + HTMX (arquivo vendorizado) |
-| BANCO | PostgreSQL 16 (Neon free em produção; Docker Compose em dev/CI) |
+| BANCO | PostgreSQL 16 (Neon free em produção; service do GitHub Actions no CI; em dev, SQLite por padrão ou Postgres via `DATABASE_URL`, ver [ADR 0001](decisoes/0001-ambiente-local-sem-docker.md)) |
 | HOSPEDAGEM | Render Web Service free + Neon free + Brevo via API HTTP (e-mail; SMTP bloqueado no Render free) + WhiteNoise (estáticos) |
 | LIMITES | Custo zero; sem Redis, sem worker e sem cron (o Render free não tem); instância de ~512 MB que hiberna; MusicBrainz a ~1 req/s por IP com `User-Agent` obrigatório; Neon ~0,5 GB e com autosuspend; e-mail com algumas centenas por dia; cobertura ≥ 80%; resposta < 500 ms com 5.000 álbuns |
 
@@ -36,7 +38,7 @@ O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zer
 
 | App/módulo | Responsabilidade |
 |---|---|
-| `config/` | settings (base/dev/prod via env), urls, wsgi |
+| `config/` | um único `settings.py` em que todo valor que muda por ambiente vem de variável de ambiente; urls, wsgi |
 | `core/` | exceções de domínio, handler de exceções do DRF, logging estruturado (JSON), middleware que troca o redirect de login por `HX-Redirect` em requisições HTMX |
 | `accounts/` | `User` custom (e-mail como login, `preferred_service`), configuração do allauth, página de perfil |
 | `musicbrainz/` | cliente HTTP isolado. Devolve DTOs (`dataclass`) e nunca objetos do ORM. É o único lugar que fala com a rede |
@@ -164,7 +166,7 @@ Rotas web: `/` (biblioteca), `/search`, `/albums/<id>`, `/random`, `/profile` e 
 | D12 | Importar links de streaming do MusicBrainz (**resolvida com testes reais**: o release group não tem links de streaming; eles ficam nas *releases*) | **Síncrono na adição, com 2 chamadas:** (1) `GET /ws/2/release-group/{mbid}?inc=genres+artist-credits` e (2) `GET /ws/2/release?release-group={mbid}&inc=url-rels&limit=100` (uma página só). Filtrar relações `streaming`, `free streaming` e `purchase for download` (esta só para Bandcamp); mapear com `detect_service`; ficar com 1 por serviço, priorizando edição com status *Official* e depois a URL mais frequente. Prós: sem worker; ~1–2 s com o throttle; uma falha na chamada (2) só deixa o álbum sem links, como o requisito permite | **Sob demanda:** adiciona só com a chamada (1) e mostra no detalhe um botão "importar links do MusicBrainz". Prós: adição mais rápida e menos cota gasta. Contra: o requisito pede os links "já cadastrados" ao adicionar | **A**, com `hx-indicator` (spinner) no botão "Adicionar". A chamada (2) tem orçamento de tempo próprio e, se estourar, é descartada |
 | D11 | Testes e2e | **pytest-playwright** (mesmo runner). Prós: integra com pytest-django (`live_server`) | **Cypress.** Contra: ecossistema Node | **A** |
 
-**Dependências (todas justificadas):** runtime com `Django`, `djangorestframework`, `django-allauth[socialaccount]` (e-mail, OAuth, reset e rate limit num pacote só), `drf-spectacular` (OpenAPI exigida), `psycopg[binary]`, `httpx` (timeout e transporte mockável), `gunicorn`, `whitenoise`, `dj-database-url` (para ler `DATABASE_URL` do Neon). Dev com `pytest`, `pytest-django`, `pytest-cov`, `respx` (mock do httpx), `pytest-playwright`, `ruff`. HTMX vendorizado como arquivo estático. Sem Celery, Redis, django-filter ou dj-rest-auth.
+**Dependências (todas justificadas):** runtime com `Django`, `djangorestframework`, `django-allauth[socialaccount]` (e-mail, OAuth, reset e rate limit num pacote só), `drf-spectacular` (OpenAPI exigida), `psycopg[binary]`, `httpx` (timeout e transporte mockável), `gunicorn`, `whitenoise`, `dj-database-url` (para ler `DATABASE_URL` do Neon). Dev com `pytest`, `pytest-django`, `pytest-cov`, `respx` (mock do httpx), `pytest-playwright`, `ruff`, `mypy` + `django-stubs` + `djangorestframework-stubs` (tipagem estrita) e `pre-commit` (ver [ADR 0002](decisoes/0002-gate-de-qualidade-estrito.md)). HTMX vendorizado como arquivo estático. Sem Celery, Redis, django-filter ou dj-rest-auth.
 
 ---
 
@@ -172,8 +174,8 @@ Rotas web: `/` (biblioteca), `/search`, `/albums/<id>`, `/random`, `/profile` e 
 
 | # | O que muda | Arquivos | Como testar | Pronto quando |
 |---|---|---|---|---|
-| 1 | Esqueleto do projeto: `pyproject.toml`, ruff, settings por env, Docker Compose (web + db), `.env.example` | `pyproject.toml`, `config/settings.py`, `docker-compose.yml`, `Dockerfile`, `manage.py` | `docker compose up`; `ruff check`; `pytest` (1 smoke test) | `/healthz` responde 200 e o lint passa |
-| 2 | CI no GitHub Actions: ruff, `makemigrations --check`, pytest com Postgres como service | `.github/workflows/ci.yml` | Abrir um PR | O pipeline fica verde |
+| 1 ✅ | Esqueleto do projeto: `pyproject.toml`, ruff + mypy strict, settings por env, `Makefile` (`make check`), pre-commit, `.env.example` (sem Docker, ver ADR 0001) | `pyproject.toml`, `config/settings.py`, `Makefile`, `.pre-commit-config.yaml`, `manage.py` | `make check` (1 smoke test) | `/healthz` responde 200 e `make check` passa |
+| 2 ✅ | CI no GitHub Actions: `make check` com `CI=true` e Postgres 16 como service (entregue no mesmo commit da tarefa 1) | `.github/workflows/ci.yml` | Abrir um PR | O pipeline fica verde |
 | 3 | `User` custom (e-mail como login, `preferred_service`) e primeira migração | `accounts/models.py`, `accounts/migrations/0001*` | Teste de criação de usuário | Migração aplicada, sem `username` |
 | 4 | allauth com e-mail/senha: cadastro, login, logout e templates básicos em PT com `gettext` | `config/settings.py`, `accounts/templates/…` | Testes de integração: cadastro feliz, e-mail duplicado, erros por campo, credencial errada com mensagem genérica | Os critérios de US01 de e-mail passam |
 | 5 | Rate limit de login (429) e `LOGIN_REQUIRED` nas rotas da biblioteca, com `next=` | settings, `core/middleware.py` (HX-Redirect) | Teste com 6 tentativas resultando em 429; acesso anônimo redireciona; requisição HTMX anônima recebe `HX-Redirect` | Força bruta, sem autenticação e sessão expirada passam |
@@ -220,7 +222,7 @@ Rotas web: `/` (biblioteca), `/search`, `/albums/<id>`, `/random`, `/profile` e 
 10. **Rate limit 429 do allauth:** confirmar na versão escolhida que a resposta é 429 nos fluxos HTML (deve renderizar `429.html`) e que o limite por e-mail e por IP segue o formato de "5 em 15 min".
 
 ## Verificação geral
-- `docker compose run web pytest --cov` ≥ 80%, `ruff check .`, `manage.py makemigrations --check`, todos no CI em cada PR.
+- `make check` (ruff format, ruff check, mypy strict, `makemigrations --check`, pytest com cobertura ≥ 80%), no CI em cada PR e no hook de pre-commit.
 - `pytest -m e2e` com Playwright contra `live_server` e o MusicBrainz mockado.
 - Swagger em `/api/docs/` gerado sem warnings.
 - Smoke test manual em produção: cadastro, OAuth, reset por e-mail real, busca real no MusicBrainz, adicionar, sortear, remover e desfazer.
