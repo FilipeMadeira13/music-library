@@ -27,7 +27,7 @@ Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 
 ## Conventions
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `refactor:`, `docs:`), in English. One `feat:` commit per task of `docs/plano.md`; review fixes (`fix:`) and docs (`docs:`) may follow as separate commits on the same branch (ADR 0008). `make check` must be green before committing (the pre-commit hook runs it).
 - **Language:** code, identifiers, comments and commit messages in English; user-facing text in Portuguese, always wrapped in `gettext` / `{% translate %}`.
-- **Tests:** every new behaviour ships with tests in the same commit. Coverage below 80% fails the build.
+- **Tests:** every new behaviour ships with tests in the same commit. Coverage below 80% fails the build. Never hardcode passwords in tests; use the `password` / `other_password` fixtures from `tests/conftest.py` (GitGuardian flags literals).
 - **Strictness:** ruff runs with `select = ["ALL"]` and mypy with `strict = true`. Don't silence a rule without a reason on the same line (`# noqa: XXX - reason`, `# type: ignore[code]  # reason`).
 - **Executable bit:** a file with a shebang must be committed as executable (`git update-index --chmod=+x <file>`). ruff's `EXE` rules don't fire under WSL, so only CI catches it.
 - **Shared models/enums:** refer to the user via `settings.AUTH_USER_MODEL` / `get_user_model()` (it is `accounts.User`, email login); streaming services come only from `library.choices.Service`. `accounts` may import `library`, never the reverse.
