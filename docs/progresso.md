@@ -20,18 +20,23 @@ Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sess�
 - Nova auditoria das docs desde `main` (`ef407ad`): progresso, README, CHANGELOG, plano e índice de ADRs atualizados com a ADR 0009.
 - Push de `feat/custom-user` e PR aberto para `main`. O CI (`make check` no Postgres 16) passou: as restrições do `User` valem também no Postgres.
 - O GitGuardian marcou 7 "Generic Password" em `tests/test_accounts_models.py` (`33d7955`, `3a098a1`). São senhas de teste inventadas (falso positivo). `d88b636` test: os testes passam a usar os fixtures `password` / `other_password` de `tests/conftest.py`, que geram senhas aleatórias por teste; os `# noqa: S106` saíram.
+- `f290adb` docs: diário com o PR, o resultado do CI e os falsos positivos do GitGuardian. `78940da` docs: regra dos fixtures de senha no `CLAUDE.md`.
+- `32f0ef7` merge do PR #2 (`feat/custom-user`) em `main`: a tarefa 3 está entregue.
+- Fechamento da sessão: ADR [0010](decisoes/0010-senhas-de-teste-geradas.md) (senhas de teste geradas em tempo de execução), status do `plano.md`, índice de ADRs e este diário.
 
 ### Onde paramos
-Branch `feat/custom-user` com push feito até `d88b636` e PR aberto para `main`, com CI verde. O check do GitGuardian continua vermelho, porque as senhas antigas seguem no histórico de `33d7955` e `3a098a1`. O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+`main` está em `32f0ef7`, com o PR #2 mesclado (tarefas 1–3 entregues). As branches `feat/custom-user` e `documentacao-swagger` já foram mescladas, mas ainda existem (local e remota). O `db.sqlite3` local tem `accounts.0001` e `0002` aplicadas.
 O `gh` não está logado no WSL e a chave SSH pede senha, então push e PR são feitos pelo usuário.
 
 ### Próximos passos
-1. No painel do GitGuardian, marcar os 7 incidentes como **Ignore → Test credential**; com o check verde, mesclar o PR.
-2. **Tarefa 4:** allauth com e-mail/senha. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso").
+1. Confirmar que os 7 incidentes do GitGuardian (`33d7955`, `3a098a1`) estão marcados como **Ignore → Test credential**. Depois, apagar as branches `feat/custom-user` e `documentacao-swagger` (local e remota).
+2. **Tarefa 4:** allauth com e-mail/senha, numa branch nova a partir de `main`. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso"). Nos testes, usar os fixtures `password` / `other_password` (ADR 0010).
 3. A partir da tarefa 9, testar localmente com Postgres via `DATABASE_URL` ou confiar no CI (ADR 0001).
 
 ### Dúvidas em aberto
-- As da sessão de 2026-11-25 continuam valendo (`.env`, `dj-rest-auth` no requisito, branch + PR por tarefa, e2e no pre-commit, riscos 5–7 e 10).
+- As da sessão de 2026-11-25 continuam valendo (`.env`, `dj-rest-auth` no requisito, e2e no pre-commit, riscos 5–7 e 10).
+- **Branch + PR por tarefa:** a tarefa 3 também entrou por branch + PR (#2), então isso já é a prática. Registrar como convenção (ADR e `CLAUDE.md`) ou deixar informal?
+- **Status do GitGuardian no PR #2:** o PR foi mesclado. Não ficou registrado se os incidentes foram marcados como *Test credential* ou se o merge foi feito com o check vermelho.
 
 ## 2026-11-25
 

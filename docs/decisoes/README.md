@@ -16,3 +16,4 @@ Formato: um arquivo `NNNN-titulo-curto.md` com as seções Status, Contexto, Dec
 | [0007](0007-genericos-dos-stubs-sob-type-checking.md) | Genéricos do `django-stubs` só sob `TYPE_CHECKING` | Aceita | 2026-11-26 |
 | [0008](0008-commits-por-tarefa.md) | Um commit `feat:` por tarefa, com `fix:`/`docs:` à parte | Aceita | 2026-11-26 |
 | [0009](0009-make-run-com-debug.md) | `make run` sobe com `DEBUG=true` por padrão | Aceita | 2026-11-26 |
+| [0010](0010-senhas-de-teste-geradas.md) | Senhas de teste geradas em tempo de execução | Aceita | 2026-11-26 |
