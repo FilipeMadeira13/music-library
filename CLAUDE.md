@@ -14,6 +14,7 @@ Session log (done, where we stopped, next steps, open questions): [docs/progress
 | `make lint` / `make types` / `make test` | Run each step on its own |
 | `.venv/bin/pytest tests/test_smoke.py -k healthz` | Run a single test (coverage threshold applies; add `--no-cov` for quick runs) |
 | `make run` | `manage.py runserver` |
+| `.venv/bin/python manage.py migrate` | Apply migrations (SQLite by default) |
 
 Settings read real environment variables only; nothing loads `.env` (export the vars from `.env.example` yourself).
 Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 16.
@@ -24,9 +25,12 @@ Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 
 `api/` DRF views (thin) · `web/` HTMX views (thin) · `tests/` pytest suite.
 
 ## Conventions
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `refactor:`, `docs:`), in English, one commit per task of `docs/plano.md`. `make check` must be green before committing (the pre-commit hook runs it).
+- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`, `refactor:`, `docs:`), in English. One `feat:` commit per task of `docs/plano.md`; review fixes (`fix:`) and docs (`docs:`) may follow as separate commits on the same branch (ADR 0008). `make check` must be green before committing (the pre-commit hook runs it).
 - **Language:** code, identifiers, comments and commit messages in English; user-facing text in Portuguese, always wrapped in `gettext` / `{% translate %}`.
 - **Tests:** every new behaviour ships with tests in the same commit. Coverage below 80% fails the build.
 - **Strictness:** ruff runs with `select = ["ALL"]` and mypy with `strict = true`. Don't silence a rule without a reason on the same line (`# noqa: XXX - reason`, `# type: ignore[code]  # reason`).
 - **Executable bit:** a file with a shebang must be committed as executable (`git update-index --chmod=+x <file>`). ruff's `EXE` rules don't fire under WSL, so only CI catches it.
+- **Shared models/enums:** refer to the user via `settings.AUTH_USER_MODEL` / `get_user_model()` (it is `accounts.User`, email login); streaming services come only from `library.choices.Service`. `accounts` may import `library`, never the reverse.
+- **E-mail:** stored lower-cased; normalize any e-mail you look up or compare with `User.objects.normalize_email` (ADR 0006).
+- **Stub generics:** `django-stubs` generics (`UserAdmin[User]`, `ModelForm[User]`, …) fail at runtime; alias them under `if TYPE_CHECKING:` as in `accounts/forms.py` (ADR 0007).
 - **Docs:** a decision that changes or adds to `docs/plano.md` gets an ADR in `docs/decisoes/`; user-visible changes get a line under `[Unreleased]` in `CHANGELOG.md`.

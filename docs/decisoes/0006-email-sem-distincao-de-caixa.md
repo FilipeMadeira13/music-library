@@ -1,6 +1,6 @@
 # 0006 — E-mail sem distinção de maiúsculas e restrições do `User` no banco
 
-- **Status:** Aceita (2026-11-26, tarefa 3, revisão do commit `33d7955`)
+- **Status:** Aceita (2026-11-26, tarefa 3, revisão do commit `33d7955`, implementada em `3a098a1`)
 - **Complementa:** o `User` do [plano.md §2](../plano.md#2-modelo-de-dados) (`email unique, login`) e a [ADR 0005](0005-enum-service-em-library.md)
 
 ## Contexto

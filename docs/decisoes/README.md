@@ -11,4 +11,7 @@ Formato: um arquivo `NNNN-titulo-curto.md` com as seções Status, Contexto, Dec
 | [0002](0002-gate-de-qualidade-estrito.md) | Gate de qualidade estrito (`make check`) | Aceita | 2026-11-22 |
 | [0003](0003-fuso-horario-fortaleza.md) | Fuso horário de exibição `America/Fortaleza` | Aceita | 2026-11-25 |
 | [0004](0004-qobuz.md) | Qobuz como serviço de streaming | Aceita | 2026-11-26 |
+| [0005](0005-enum-service-em-library.md) | Enum `Service` em `library/choices.py` | Aceita | 2026-11-26 |
 | [0006](0006-email-sem-distincao-de-caixa.md) | E-mail sem distinção de maiúsculas e restrições do `User` no banco | Aceita | 2026-11-26 |
+| [0007](0007-genericos-dos-stubs-sob-type-checking.md) | Genéricos do `django-stubs` só sob `TYPE_CHECKING` | Aceita | 2026-11-26 |
+| [0008](0008-commits-por-tarefa.md) | Um commit `feat:` por tarefa, com `fix:`/`docs:` à parte | Aceita | 2026-11-26 |

@@ -13,10 +13,12 @@ Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sess�
   - `UserAdmin` e formulários baseados em e-mail (`accounts/admin.py`, `accounts/forms.py`); os genéricos dos stubs ficam atrás de `TYPE_CHECKING`, porque `django_stubs_ext` é só dependência de dev.
   - `accounts/migrations/0002` normaliza as linhas existentes antes de criar as restrições.
   - Testes: `authenticate` com caixa variada e senha errada, duplicata por caixa (via `create_user`, `update()` e `full_clean`), `createsuperuser --noinput`, conta sem senha, coluna `username` ausente no banco, admin (lista, edição, cadastro e duplicata). 35 testes, cobertura 98,8%, só em SQLite.
+- `3a098a1` é o commit `fix:` acima.
+- Auditoria das docs contra o código desde `main` (`ef407ad`): status, modelo `User` e arquivos da tarefa 3 no `plano.md`; regras de e-mail, direção de import e genéricos dos stubs no `CLAUDE.md`; admin no `README.md`; hashes no `CHANGELOG.md`. ADRs novos: [0007](decisoes/0007-genericos-dos-stubs-sob-type-checking.md) (genéricos dos stubs sob `TYPE_CHECKING`) e [0008](decisoes/0008-commits-por-tarefa.md) (um `feat:` por tarefa, `fix:`/`docs:` à parte).
 
 ### Onde paramos
-Branch `feat/custom-user`, com `33d7955` e o commit `fix:` da revisão, **ainda sem push** (sem upstream). O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
-Ficaram **fora do commit**, no working tree: ADR 0005 (`docs/decisoes/0005-enum-service-em-library.md`) e a linha dela no índice, o status da tarefa 3 em `plano.md`, a faixa "ADRs 0001–0006" no `CHANGELOG.md`, a regra de models/enums compartilhados no `CLAUDE.md` e o `migrate` no `README.md`.
+Branch `feat/custom-user`, com `33d7955` e `3a098a1`, **ainda sem push** (sem upstream). O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+Todas as mudanças de docs (ADRs 0005, 0007 e 0008, plano, CLAUDE.md, README, CHANGELOG, este diário) estão **no working tree, sem commit**.
 
 ### Próximos passos
 1. Commitar as mudanças de docs pendentes (`docs:`), fazer push e abrir o PR de `feat/custom-user`; conferir que o CI passa no Postgres 16 (as restrições novas só foram testadas em SQLite).
