@@ -27,7 +27,7 @@ Aplicação web para catalogar e organizar álbuns de música. Os serviços de s
 | # | Tema | Decisão |
 |---|---|---|
 | 1 | Stack | **Python + Django + Django REST Framework + PostgreSQL**. |
-| 1a | Frontend | **Templates Django + HTMX**, renderizados no servidor no mesmo domínio do backend. As views HTMX devolvem fragmentos HTML. A **API REST (DRF)** expõe os mesmos recursos (documentação OpenAPI, testes e uso futuro). As duas camadas chamam uma **camada de serviços** comum, de modo que a regra de negócio não fica duplicada. |
+| 1a | Frontend | **Templates Django + HTMX**, renderizados no servidor no mesmo domínio do backend. As views HTMX devolvem fragmentos HTML. A **API REST (DRF)** expõe os mesmos recursos (documentação OpenAPI 3/Swagger via `drf-spectacular`, testes e uso futuro). As duas camadas chamam uma **camada de serviços** comum, de modo que a regra de negócio não fica duplicada. |
 | 2 | Autenticação | **E-mail/senha e OAuth (Google e GitHub)**, com **"esqueci minha senha"** por e-mail. Sugestão: `django-allauth` + `dj-rest-auth`. |
 | 3 | Fonte de metadados | **MusicBrainz** (API pública, sem chave) + **Cover Art Archive** para as capas. |
 | 4 | Unidade "álbum" | **A obra** (o *release group* do MusicBrainz), não uma edição específica. |
@@ -40,7 +40,7 @@ Aplicação web para catalogar e organizar álbuns de música. Os serviços de s
 | 11 | Dispositivos | Layout responsivo (celular e desktop) desde a v1. |
 | 12 | Idioma | Interface em português, com textos preparados para i18n (`gettext`), sem tradução na v1. |
 | 13 | Deploy sem custo | Ver a seção 7. |
-| 14 | Qualidade | **Sim:** testes automatizados (unidade, integração e e2e), CI no GitHub Actions e documentação OpenAPI. |
+| 14 | Qualidade | **Sim:** testes automatizados (unidade, integração e e2e), CI no GitHub Actions e documentação OpenAPI 3 com Swagger UI, gerada por `drf-spectacular`. |
 
 ## 4. Histórias de usuário
 
@@ -168,9 +168,9 @@ Aplicação web para catalogar e organizar álbuns de música. Os serviços de s
 | Integração externa | Cliente do MusicBrainz isolado num módulo, com timeout de 5 s, retry com backoff, limite de ~1 req/s, `User-Agent` identificado e cache das buscas. |
 | Disponibilidade | Se o MusicBrainz cair, a biblioteca local continua funcionando (só a busca externa fica indisponível). |
 | Acessibilidade | Navegação por teclado, `alt` nas capas, contraste AA, foco visível. |
-| i18n | Textos marcados com `gettext`; datas no fuso `America/Sao_Paulo` na exibição e em UTC no banco. |
+| i18n | Textos marcados com `gettext`; datas no fuso `America/Fortaleza` na exibição e em UTC no banco. |
 | Observabilidade | Logs estruturados de erros e das chamadas externas (sem dados sensíveis). |
-| Qualidade | Testes com pytest + pytest-django (unidade e integração, com o MusicBrainz mockado); testes e2e (por exemplo Playwright); cobertura mínima de 80%; lint e formatação com ruff; CI no GitHub Actions rodando lint, testes e migrações em cada PR; documentação OpenAPI gerada por `drf-spectacular`, com Swagger UI. |
+| Qualidade | Testes com pytest + pytest-django (unidade e integração, com o MusicBrainz mockado); testes e2e (por exemplo Playwright); cobertura mínima de 80%; lint e formatação com ruff; checagem de tipos com mypy strict; CI no GitHub Actions rodando lint, tipos, testes e migrações em cada PR; documentação OpenAPI gerada por `drf-spectacular`, com Swagger UI. |
 
 ## 7. Deploy sem custo (sugestão)
 
@@ -183,7 +183,7 @@ Planos gratuitos mudam com frequência, então confira as condições atuais ant
 | E-mail (redefinir senha) | **Brevo** (free), via **API HTTP** | O Render free bloqueia o envio por SMTP (portas 25, 465 e 587) desde 26/09/2025, então o e-mail sai pela API HTTP do Brevo (~300 e-mails/dia, mais que suficiente). O Brevo aceita um remetente único verificado, sem domínio próprio. Sem domínio próprio, os e-mails podem cair no spam, o que é aceitável para portfólio. Detalhes na decisão D10 de [plano.md](plano.md). |
 | Frontend | Junto com o backend | Templates + HTMX são servidos pelo próprio Django. O HTMX é um único arquivo JS, incluído nos estáticos. |
 | Arquivos estáticos | **WhiteNoise** | Serve os estáticos pelo próprio Django, sem serviço extra. As capas não são armazenadas, só a URL do Cover Art Archive. |
-| Desenvolvimento local | **Docker Compose** (Django + Postgres) | Mesma configuração para dev e CI. |
+| Desenvolvimento local | **venv + `make`**, com SQLite por padrão ou Postgres via `DATABASE_URL` | O CI roda o mesmo `make check` contra Postgres 16. Ver a [ADR 0001](decisoes/0001-ambiente-local-sem-docker.md). |
 
 ## 8. Fora do escopo da v1
 - Reprodução de áudio dentro do app.

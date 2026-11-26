@@ -2,6 +2,7 @@
 
 Personal music library (Django 5.2 + DRF + HTMX, PostgreSQL) backed by MusicBrainz.
 Requirements: [docs/requisitos.md](docs/requisitos.md). Architecture, data model and task order: [docs/plano.md](docs/plano.md).
+Decisions that deviate from or extend the plan: [docs/decisoes/](docs/decisoes/). Notable changes: [CHANGELOG.md](CHANGELOG.md).
 
 ## Commands
 | Command | What it does |
@@ -13,7 +14,8 @@ Requirements: [docs/requisitos.md](docs/requisitos.md). Architecture, data model
 | `.venv/bin/pytest tests/test_smoke.py -k healthz` | Run a single test (coverage threshold applies; add `--no-cov` for quick runs) |
 | `make run` | `manage.py runserver` |
 
-Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 16. See `.env.example`.
+Settings read real environment variables only; nothing loads `.env` (export the vars from `.env.example` yourself).
+Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 16.
 
 ## Layout
 `config/` settings/urls · `core/` cross-cutting (errors, logging, middleware, `/healthz`) · `accounts/` users/auth ·
@@ -25,3 +27,5 @@ Without `DATABASE_URL` the project uses SQLite (`db.sqlite3`); CI uses Postgres 
 - **Language:** code, identifiers, comments and commit messages in English; user-facing text in Portuguese, always wrapped in `gettext` / `{% translate %}`.
 - **Tests:** every new behaviour ships with tests in the same commit. Coverage below 80% fails the build.
 - **Strictness:** ruff runs with `select = ["ALL"]` and mypy with `strict = true`. Don't silence a rule without a reason on the same line (`# noqa: XXX - reason`, `# type: ignore[code]  # reason`).
+- **Executable bit:** a file with a shebang must be committed as executable (`git update-index --chmod=+x <file>`). ruff's `EXE` rules don't fire under WSL, so only CI catches it.
+- **Docs:** a decision that changes or adds to `docs/plano.md` gets an ADR in `docs/decisoes/`; user-visible changes get a line under `[Unreleased]` in `CHANGELOG.md`.
