@@ -18,12 +18,15 @@ Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sess�
 - `2d13c8c` docs: a auditoria acima, commitada.
 - Admin sem CSS no dev: o servidor subia com `DEBUG=False` (o `settings.py` assume `False` sem a variável, e nada carrega o `.env`), e nesse modo o `runserver` não serve `/static/`. O `source .env.example` exportava junto `DATABASE_URL` e trocava o SQLite por um Postgres inexistente. Agora `make run` exporta `DEBUG=true` por padrão e o `.env.example` deixa `DATABASE_URL` comentado ([ADR 0009](decisoes/0009-make-run-com-debug.md)).
 - Nova auditoria das docs desde `main` (`ef407ad`): progresso, README, CHANGELOG, plano e índice de ADRs atualizados com a ADR 0009.
+- Push de `feat/custom-user` e PR aberto para `main`. O CI (`make check` no Postgres 16) passou: as restrições do `User` valem também no Postgres.
+- O GitGuardian marcou 7 "Generic Password" em `tests/test_accounts_models.py` (`33d7955`, `3a098a1`). São senhas de teste inventadas (falso positivo). `d88b636` test: os testes passam a usar os fixtures `password` / `other_password` de `tests/conftest.py`, que geram senhas aleatórias por teste; os `# noqa: S106` saíram.
 
 ### Onde paramos
-Branch `feat/custom-user`, com `33d7955`, `3a098a1`, `2d13c8c`, `2267323` (chore: `make run` com `DEBUG=true`) e `7d7d185` (docs: ADR 0009), além deste ajuste do diário. Tudo commitado; falta o push e o PR para `main`. O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+Branch `feat/custom-user` com push feito até `d88b636` e PR aberto para `main`, com CI verde. O check do GitGuardian continua vermelho, porque as senhas antigas seguem no histórico de `33d7955` e `3a098a1`. O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+O `gh` não está logado no WSL e a chave SSH pede senha, então push e PR são feitos pelo usuário.
 
 ### Próximos passos
-1. Fazer push, abrir o PR de `feat/custom-user` e mesclar; conferir que o CI passa no Postgres 16 (as restrições novas só foram testadas em SQLite).
+1. No painel do GitGuardian, marcar os 7 incidentes como **Ignore → Test credential**; com o check verde, mesclar o PR.
 2. **Tarefa 4:** allauth com e-mail/senha. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso").
 3. A partir da tarefa 9, testar localmente com Postgres via `DATABASE_URL` ou confiar no CI (ADR 0001).
 
