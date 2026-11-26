@@ -2,6 +2,37 @@
 
 Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sessão mais recente fica no topo.
 
+## 2026-11-26
+
+### Feito
+- `33d7955` feat: tarefa 3 — `User` custom (e-mail como login, sem `username`, `preferred_service` opcional), enum `Service` em `library/choices.py` com Qobuz ([ADR 0004](decisoes/0004-qobuz.md)) e `accounts/migrations/0001`.
+- Revisão do commit acima (`git diff main...HEAD`). Achados e correções, no commit `fix:` seguinte ([ADR 0006](decisoes/0006-email-sem-distincao-de-caixa.md)):
+  - **Importante:** o e-mail diferenciava maiúsculas na unicidade e no login (`normalize_email` do Django só baixa o domínio). Agora é guardado inteiro em minúsculas (`UserManager.normalize_email`, `User.save()`, `get_by_natural_key`) e há `UniqueConstraint(Lower("email"))` no banco.
+  - `preferred_service` só era validado em `full_clean()`: agora um `CheckConstraint` aceita só `Service.values` ou `NULL` (rejeita `""`).
+  - `create_user` rejeita e-mail vazio, só com espaços ou mal formatado.
+  - `UserAdmin` e formulários baseados em e-mail (`accounts/admin.py`, `accounts/forms.py`); os genéricos dos stubs ficam atrás de `TYPE_CHECKING`, porque `django_stubs_ext` é só dependência de dev.
+  - `accounts/migrations/0002` normaliza as linhas existentes antes de criar as restrições.
+  - Testes: `authenticate` com caixa variada e senha errada, duplicata por caixa (via `create_user`, `update()` e `full_clean`), `createsuperuser --noinput`, conta sem senha, coluna `username` ausente no banco, admin (lista, edição, cadastro e duplicata). 35 testes, cobertura 98,8%, só em SQLite.
+- `3a098a1` é o commit `fix:` acima.
+- Auditoria das docs contra o código desde `main` (`ef407ad`): status, modelo `User` e arquivos da tarefa 3 no `plano.md`; regras de e-mail, direção de import e genéricos dos stubs no `CLAUDE.md`; admin no `README.md`; hashes no `CHANGELOG.md`. ADRs novos: [0007](decisoes/0007-genericos-dos-stubs-sob-type-checking.md) (genéricos dos stubs sob `TYPE_CHECKING`) e [0008](decisoes/0008-commits-por-tarefa.md) (um `feat:` por tarefa, `fix:`/`docs:` à parte).
+- `2d13c8c` docs: a auditoria acima, commitada.
+- Admin sem CSS no dev: o servidor subia com `DEBUG=False` (o `settings.py` assume `False` sem a variável, e nada carrega o `.env`), e nesse modo o `runserver` não serve `/static/`. O `source .env.example` exportava junto `DATABASE_URL` e trocava o SQLite por um Postgres inexistente. Agora `make run` exporta `DEBUG=true` por padrão e o `.env.example` deixa `DATABASE_URL` comentado ([ADR 0009](decisoes/0009-make-run-com-debug.md)).
+- Nova auditoria das docs desde `main` (`ef407ad`): progresso, README, CHANGELOG, plano e índice de ADRs atualizados com a ADR 0009.
+- Push de `feat/custom-user` e PR aberto para `main`. O CI (`make check` no Postgres 16) passou: as restrições do `User` valem também no Postgres.
+- O GitGuardian marcou 7 "Generic Password" em `tests/test_accounts_models.py` (`33d7955`, `3a098a1`). São senhas de teste inventadas (falso positivo). `d88b636` test: os testes passam a usar os fixtures `password` / `other_password` de `tests/conftest.py`, que geram senhas aleatórias por teste; os `# noqa: S106` saíram.
+
+### Onde paramos
+Branch `feat/custom-user` com push feito até `d88b636` e PR aberto para `main`, com CI verde. O check do GitGuardian continua vermelho, porque as senhas antigas seguem no histórico de `33d7955` e `3a098a1`. O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+O `gh` não está logado no WSL e a chave SSH pede senha, então push e PR são feitos pelo usuário.
+
+### Próximos passos
+1. No painel do GitGuardian, marcar os 7 incidentes como **Ignore → Test credential**; com o check verde, mesclar o PR.
+2. **Tarefa 4:** allauth com e-mail/senha. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso").
+3. A partir da tarefa 9, testar localmente com Postgres via `DATABASE_URL` ou confiar no CI (ADR 0001).
+
+### Dúvidas em aberto
+- As da sessão de 2026-11-25 continuam valendo (`.env`, `dj-rest-auth` no requisito, branch + PR por tarefa, e2e no pre-commit, riscos 5–7 e 10).
+
 ## 2026-11-25
 
 ### Feito

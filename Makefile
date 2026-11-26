@@ -40,5 +40,7 @@ test:
 
 check: format lint types migrations-check test
 
+# Local dev server: DEBUG defaults to true so runserver serves static files (admin CSS).
+# An explicitly exported DEBUG still wins.
 run:
-	$(BIN)/python manage.py runserver
+	DEBUG=$${DEBUG:-true} $(BIN)/python manage.py runserver

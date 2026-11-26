@@ -3,7 +3,7 @@
 ## Context
 O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zero. Este plano traduz os requisitos em arquitetura, modelo de dados, contratos, estratégia de erros e uma sequência de commits pequenos.
 
-> **Status (2026-11-25):** as tarefas 1 e 2 foram entregues no commit `b85399a` (correção em `16f5931`); a documentação foi sincronizada em `7cb4357`. A próxima é a tarefa 3. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito; ADR 0003: fuso `America/Fortaleza`). O diário de sessões fica em [progresso.md](progresso.md).
+> **Status (2026-11-26):** as tarefas 1 e 2 foram entregues no commit `b85399a` (correção em `16f5931`) e a tarefa 3 em `33d7955` (revisão em `3a098a1`). A próxima é a tarefa 4. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito; ADR 0003: fuso `America/Fortaleza`; ADR 0004: Qobuz; ADR 0005: enum `Service` em `library/choices.py`; ADR 0006: e-mail sem distinção de caixa; ADR 0007: genéricos dos stubs sob `TYPE_CHECKING`; ADR 0008: commits por tarefa; ADR 0009: `make run` com `DEBUG=true`). O diário de sessões fica em [progresso.md](progresso.md).
 
 ### Campos preenchidos (tirados do documento de requisitos)
 | Campo | Valor |
@@ -40,9 +40,9 @@ O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zer
 |---|---|
 | `config/` | um único `settings.py` em que todo valor que muda por ambiente vem de variável de ambiente; urls, wsgi |
 | `core/` | exceções de domínio, handler de exceções do DRF, logging estruturado (JSON), middleware que troca o redirect de login por `HX-Redirect` em requisições HTMX |
-| `accounts/` | `User` custom (e-mail como login, `preferred_service`), configuração do allauth, página de perfil |
+| `accounts/` | `User` custom (e-mail como login, `preferred_service`), admin baseado em e-mail, configuração do allauth, página de perfil |
 | `musicbrainz/` | cliente HTTP isolado. Devolve DTOs (`dataclass`) e nunca objetos do ORM. É o único lugar que fala com a rede |
-| `library/` | models, `services.py`, `query.py`, `streaming.py`, `random.py` |
+| `library/` | models, `choices.py` (enum `Service`, também usado por `accounts`), `services.py`, `query.py`, `streaming.py`, `random.py` |
 | `api/` | serializers e views DRF que apenas validam a entrada, chamam o serviço e serializam a saída |
 | `web/` | views que devolvem páginas ou fragmentos HTMX, chamando os mesmos serviços |
 
@@ -56,8 +56,8 @@ Fluxo das duas camadas: a view (API ou web) valida o formato da entrada e chama 
 
 ```
 User (AbstractUser, username removido)
-  email            unique, login
-  preferred_service  choices(Service) null
+  email            unique sem caixa (guardado em minúsculas, UNIQUE(LOWER(email))), login  — ADR 0006
+  preferred_service  choices(Service) null, CHECK (∈ Service ou NULL)
 
 Album  — catálogo compartilhado, dados do MusicBrainz, somente leitura para o usuário
   id, mbid UUID unique, title, artist_name, year int null,
@@ -78,7 +78,7 @@ UserAlbum  — o "álbum na minha biblioteca"
 
 StreamingLink
   id, user_album FK (cascade)
-  service  enum(tidal, spotify, apple_music, deezer, youtube_music, amazon_music, bandcamp, other)
+  service  enum(tidal, spotify, apple_music, deezer, youtube_music, amazon_music, bandcamp, qobuz, other)
   url      varchar(2000)   label varchar(80) null (só para "other")
   source   enum(musicbrainz, user)   created_at
   UNIQUE(user_album, service) WHERE service <> 'other'
@@ -170,14 +170,14 @@ Rotas web: `/` (biblioteca), `/search`, `/albums/<id>`, `/random`, `/profile` e 
 
 ---
 
-## 5. Tarefas (1 commit cada, em ordem)
+## 5. Tarefas (1 commit `feat:` cada, em ordem; `fix:`/`docs:` da revisão à parte, ver [ADR 0008](decisoes/0008-commits-por-tarefa.md))
 
 | # | O que muda | Arquivos | Como testar | Pronto quando |
 |---|---|---|---|---|
 | 1 ✅ | Esqueleto do projeto: `pyproject.toml`, ruff + mypy strict, settings por env, `Makefile` (`make check`), pre-commit, `.env.example` (sem Docker, ver ADR 0001) | `pyproject.toml`, `config/settings.py`, `Makefile`, `.pre-commit-config.yaml`, `manage.py` | `make check` (1 smoke test) | `/healthz` responde 200 e `make check` passa |
 | 2 ✅ | CI no GitHub Actions: `make check` com `CI=true` e Postgres 16 como service (entregue no mesmo commit da tarefa 1) | `.github/workflows/ci.yml` | Abrir um PR | O pipeline fica verde |
-| 3 ⏭️ | `User` custom (e-mail como login, `preferred_service`) e primeira migração | `accounts/models.py`, `accounts/migrations/0001*` | Teste de criação de usuário | Migração aplicada, sem `username` |
-| 4 | allauth com e-mail/senha: cadastro, login, logout e templates básicos em PT com `gettext` | `config/settings.py`, `accounts/templates/…` | Testes de integração: cadastro feliz, e-mail duplicado, erros por campo, credencial errada com mensagem genérica | Os critérios de US01 de e-mail passam |
+| 3 ✅ | `User` custom (e-mail como login, `preferred_service`) e primeira migração | `accounts/models.py`, `accounts/admin.py`, `accounts/forms.py`, `accounts/migrations/0001*`–`0002*`, `library/choices.py` | Testes de criação de usuário, e-mail sem caixa, constraints e admin | Migração aplicada, sem `username` |
+| 4 ⏭️ | allauth com e-mail/senha: cadastro, login, logout e templates básicos em PT com `gettext` | `config/settings.py`, `accounts/templates/…` | Testes de integração: cadastro feliz, e-mail duplicado, erros por campo, credencial errada com mensagem genérica | Os critérios de US01 de e-mail passam |
 | 5 | Rate limit de login (429) e `LOGIN_REQUIRED` nas rotas da biblioteca, com `next=` | settings, `core/middleware.py` (HX-Redirect) | Teste com 6 tentativas resultando em 429; acesso anônimo redireciona; requisição HTMX anônima recebe `HX-Redirect` | Força bruta, sem autenticação e sessão expirada passam |
 | 6 | Redefinir senha: timeout de 1 h, mensagem neutra, rate limit 3/h, falha de e-mail só no log | settings, templates | Testes com `mail.outbox`, token usado ou expirado, e-mail inexistente, backend que lança exceção | US02 completa |
 | 6b | `BrevoEmailBackend` (D10): monta o JSON (remetente, destinatário, assunto, texto/HTML), timeout de 10 s, loga a falha sem expor o destinatário, respeita `fail_silently`; seleção por `EMAIL_BACKEND` no env | `core/email.py`, `config/settings.py`, `.env.example` | `respx`: 201 → sucesso; 4xx/5xx/timeout → exceção ou `fail_silently`; payload conferido | Backend testado; produção configurável só por env |

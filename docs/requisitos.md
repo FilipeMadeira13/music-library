@@ -33,7 +33,7 @@ Aplicação web para catalogar e organizar álbuns de música. Os serviços de s
 | 4 | Unidade "álbum" | **A obra** (o *release group* do MusicBrainz), não uma edição específica. |
 | 5 | Gênero | Os gêneros vêm do MusicBrainz e o usuário pode editá-los no seu álbum. |
 | 6 | Status de escuta | Três status: `quero ouvir` (padrão), `ouvindo`, `já ouvi`. Guarda a data em que o álbum passou a "já ouvi". Não conta quantas vezes foi reouvido na v1. |
-| 7 | Links de streaming | **O usuário cadastra os links**, e cada álbum pode ter **vários links, um por serviço** (Tidal, Spotify, Apple Music, Deezer, YouTube Music, Amazon Music, Bandcamp ou "outro"). O serviço é identificado pelo domínio da URL. Ao adicionar um álbum, os links que existirem nas relações de URL do MusicBrainz são importados como ponto de partida e podem ser editados ou removidos. No perfil, o usuário escolhe um **serviço preferido**, que vira o botão principal "Abrir no Tidal" (o usuário troca de serviço com frequência). |
+| 7 | Links de streaming | **O usuário cadastra os links**, e cada álbum pode ter **vários links, um por serviço** (Tidal, Spotify, Apple Music, Deezer, YouTube Music, Amazon Music, Bandcamp, Qobuz ou "outro"). O serviço é identificado pelo domínio da URL. Ao adicionar um álbum, os links que existirem nas relações de URL do MusicBrainz são importados como ponto de partida e podem ser editados ou removidos. No perfil, o usuário escolhe um **serviço preferido**, que vira o botão principal "Abrir no Tidal" (o usuário troca de serviço com frequência). |
 | 8 | Sorteio | **Todos os álbuns elegíveis têm o mesmo peso** (distribuição uniforme). Com 2 ou mais elegíveis, o álbum sorteado logo antes não sai de novo em seguida. |
 | 9 | Remoção | Confirmação + "desfazer" por alguns segundos. Sem lixeira. |
 | 10 | Visibilidade | A biblioteca é sempre privada na v1. |
@@ -141,7 +141,7 @@ Aplicação web para catalogar e organizar álbuns de música. Os serviços de s
 
 ### US10 — Links de streaming
 - **Cadastrar:** Dado um álbum, quando colo `https://tidal.com/browse/album/123`, então o link é salvo e o serviço é identificado como "Tidal".
-- **Serviços reconhecidos:** Tidal (`tidal.com`, `listen.tidal.com`), Spotify (`open.spotify.com`), Apple Music (`music.apple.com`), Deezer (`deezer.com`), YouTube Music (`music.youtube.com`), Amazon Music (`music.amazon.*`), Bandcamp (`*.bandcamp.com`). Qualquer outra URL `https://` válida é salva como "Outro", com um nome opcional dado pelo usuário.
+- **Serviços reconhecidos:** Tidal (`tidal.com`, `listen.tidal.com`), Spotify (`open.spotify.com`), Apple Music (`music.apple.com`), Deezer (`deezer.com`), YouTube Music (`music.youtube.com`), Amazon Music (`music.amazon.*`), Bandcamp (`*.bandcamp.com`), Qobuz (`qobuz.com`, `open.qobuz.com`, `play.qobuz.com`). Qualquer outra URL `https://` válida é salva como "Outro", com um nome opcional dado pelo usuário.
 - **Um por serviço:** Dado que o álbum já tem um link do Tidal, quando cadastro outro link do Tidal, então ele substitui o anterior, depois de confirmação. Restrição `UNIQUE(album_do_usuario, servico)`; a exceção é "Outro", que permite vários.
 - **Editar e remover:** Posso editar ou remover qualquer link, inclusive os importados do MusicBrainz.
 - **Importação do MusicBrainz:** Dado que o MusicBrainz tem links de streaming do álbum, quando adiciono o álbum, então eles aparecem já cadastrados. Se o MusicBrainz falhar nessa etapa, o álbum é adicionado mesmo assim, sem links.
