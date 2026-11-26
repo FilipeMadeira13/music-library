@@ -1,7 +1,8 @@
 import pytest
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.core.management import call_command
+from django.db import IntegrityError, connection
 
 from accounts.models import User
 from library.choices import Service
@@ -14,19 +15,33 @@ def test_auth_user_model_is_custom_user() -> None:
 
 
 def test_create_user_normalizes_email_and_hashes_password() -> None:
-    user = User.objects.create_user("Ana@EXAMPLE.com", "s3cret-pass")
+    user = User.objects.create_user("  Ana@EXAMPLE.com ", "s3cret-pass")
 
-    assert user.email == "Ana@example.com"
+    assert user.email == "ana@example.com"
     assert user.check_password("s3cret-pass")
     assert not user.is_staff
     assert not user.is_superuser
     assert user.preferred_service is None
-    assert str(user) == "Ana@example.com"
+    assert str(user) == "ana@example.com"
 
 
-def test_create_user_without_email_fails() -> None:
-    with pytest.raises(ValueError, match="e-mail"):
-        User.objects.create_user("", "s3cret-pass")
+def test_create_user_without_password_has_unusable_password() -> None:
+    user = User.objects.create_user("oauth@example.com")
+
+    assert not user.has_usable_password()
+
+
+@pytest.mark.parametrize("email", ["", "   "])
+def test_create_user_without_email_fails(email: str) -> None:
+    with pytest.raises(ValueError, match="required"):
+        User.objects.create_user(email, "s3cret-pass")
+
+
+@pytest.mark.parametrize("email", ["sem-arroba", "ana@", "@example.com"])
+def test_create_user_with_malformed_email_fails(email: str) -> None:
+    with pytest.raises(ValueError, match="Invalid e-mail"):
+        User.objects.create_user(email, "s3cret-pass")
+    assert not User.objects.exists()
 
 
 def test_create_superuser_sets_flags() -> None:
@@ -42,6 +57,18 @@ def test_create_superuser_rejects_false_flags(flag: str) -> None:
         User.objects.create_superuser("admin@example.com", "s3cret-pass", **{flag: False})
 
 
+def test_createsuperuser_command_without_input(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DJANGO_SUPERUSER_EMAIL", "Admin@Example.com")
+    monkeypatch.setenv("DJANGO_SUPERUSER_PASSWORD", "s3cret-pass")
+
+    call_command("createsuperuser", interactive=False, verbosity=0)
+
+    admin = User.objects.get()
+    assert admin.email == "admin@example.com"
+    assert admin.is_superuser
+    assert admin.check_password("s3cret-pass")
+
+
 def test_duplicate_email_is_rejected() -> None:
     User.objects.create_user("ana@example.com", "s3cret-pass")
 
@@ -49,12 +76,63 @@ def test_duplicate_email_is_rejected() -> None:
         User.objects.create_user("ana@example.com", "other-pass")
 
 
+def test_duplicate_email_with_different_case_is_rejected() -> None:
+    User.objects.create_user("ana@example.com", "s3cret-pass")
+
+    with pytest.raises(IntegrityError):
+        User.objects.create_user("ANA@Example.COM", "other-pass")
+
+
+def test_save_normalizes_email_set_directly() -> None:
+    user = User(email=" Ana@Example.COM ")
+    user.set_password("s3cret-pass")
+    user.save()
+
+    user.refresh_from_db()
+    assert user.email == "ana@example.com"
+
+
+def test_db_rejects_mixed_case_duplicate_written_by_update() -> None:
+    User.objects.create_user("ana@example.com", "s3cret-pass")
+    other = User.objects.create_user("bia@example.com", "s3cret-pass")
+
+    with pytest.raises(IntegrityError):
+        User.objects.filter(pk=other.pk).update(email="ANA@example.com")
+
+
+def test_full_clean_reports_case_insensitive_duplicate() -> None:
+    User.objects.create_user("ana@example.com", "s3cret-pass")
+    user = User(email="ANA@example.com")
+    user.set_password("s3cret-pass")
+
+    with pytest.raises(ValidationError) as exc:
+        user.full_clean()
+    assert "email" in exc.value.message_dict
+
+
+@pytest.mark.parametrize("typed", ["ana@example.com", "ANA@Example.com", " Ana@example.com "])
+def test_authenticate_by_email_ignores_case(typed: str) -> None:
+    user = User.objects.create_user("Ana@example.com", "s3cret-pass")
+
+    assert authenticate(email=typed, password="s3cret-pass") == user  # noqa: S106 - test credential
+
+
+def test_authenticate_with_wrong_password_fails() -> None:
+    User.objects.create_user("ana@example.com", "s3cret-pass")
+
+    assert authenticate(email="ana@example.com", password="wrong-pass") is None  # noqa: S106 - test credential
+
+
 def test_email_is_the_login_and_username_is_gone() -> None:
     assert User.USERNAME_FIELD == "email"
     assert User.REQUIRED_FIELDS == []
-    field_names = {f.name for f in User._meta.get_fields()}  # noqa: SLF001 - _meta is Django's public model API
-    assert "username" not in field_names
-    assert "email" in field_names
+    with connection.cursor() as cursor:
+        columns = {
+            c.name
+            for c in connection.introspection.get_table_description(cursor, User._meta.db_table)  # noqa: SLF001 - _meta is Django's public model API
+        }
+    assert "username" not in columns
+    assert "email" in columns
 
 
 @pytest.mark.parametrize("service", [Service.TIDAL, Service.QOBUZ, Service.OTHER])
@@ -73,3 +151,9 @@ def test_preferred_service_rejects_unknown_value() -> None:
     with pytest.raises(ValidationError) as exc:
         user.full_clean()
     assert "preferred_service" in exc.value.message_dict
+
+
+@pytest.mark.parametrize("value", ["napster", ""])
+def test_db_rejects_invalid_preferred_service(value: str) -> None:
+    with pytest.raises(IntegrityError):
+        User.objects.create_user("ana@example.com", "s3cret-pass", preferred_service=value)

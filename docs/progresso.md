@@ -2,6 +2,30 @@
 
 Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sessão mais recente fica no topo.
 
+## 2026-11-26
+
+### Feito
+- `33d7955` feat: tarefa 3 — `User` custom (e-mail como login, sem `username`, `preferred_service` opcional), enum `Service` em `library/choices.py` com Qobuz ([ADR 0004](decisoes/0004-qobuz.md)) e `accounts/migrations/0001`.
+- Revisão do commit acima (`git diff main...HEAD`). Achados e correções, no commit `fix:` seguinte ([ADR 0006](decisoes/0006-email-sem-distincao-de-caixa.md)):
+  - **Importante:** o e-mail diferenciava maiúsculas na unicidade e no login (`normalize_email` do Django só baixa o domínio). Agora é guardado inteiro em minúsculas (`UserManager.normalize_email`, `User.save()`, `get_by_natural_key`) e há `UniqueConstraint(Lower("email"))` no banco.
+  - `preferred_service` só era validado em `full_clean()`: agora um `CheckConstraint` aceita só `Service.values` ou `NULL` (rejeita `""`).
+  - `create_user` rejeita e-mail vazio, só com espaços ou mal formatado.
+  - `UserAdmin` e formulários baseados em e-mail (`accounts/admin.py`, `accounts/forms.py`); os genéricos dos stubs ficam atrás de `TYPE_CHECKING`, porque `django_stubs_ext` é só dependência de dev.
+  - `accounts/migrations/0002` normaliza as linhas existentes antes de criar as restrições.
+  - Testes: `authenticate` com caixa variada e senha errada, duplicata por caixa (via `create_user`, `update()` e `full_clean`), `createsuperuser --noinput`, conta sem senha, coluna `username` ausente no banco, admin (lista, edição, cadastro e duplicata). 35 testes, cobertura 98,8%, só em SQLite.
+
+### Onde paramos
+Branch `feat/custom-user`, com `33d7955` e o commit `fix:` da revisão, **ainda sem push** (sem upstream). O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
+Ficaram **fora do commit**, no working tree: ADR 0005 (`docs/decisoes/0005-enum-service-em-library.md`) e a linha dela no índice, o status da tarefa 3 em `plano.md`, a faixa "ADRs 0001–0006" no `CHANGELOG.md`, a regra de models/enums compartilhados no `CLAUDE.md` e o `migrate` no `README.md`.
+
+### Próximos passos
+1. Commitar as mudanças de docs pendentes (`docs:`), fazer push e abrir o PR de `feat/custom-user`; conferir que o CI passa no Postgres 16 (as restrições novas só foram testadas em SQLite).
+2. **Tarefa 4:** allauth com e-mail/senha. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso").
+3. A partir da tarefa 9, testar localmente com Postgres via `DATABASE_URL` ou confiar no CI (ADR 0001).
+
+### Dúvidas em aberto
+- As da sessão de 2026-11-25 continuam valendo (`.env`, `dj-rest-auth` no requisito, branch + PR por tarefa, e2e no pre-commit, riscos 5–7 e 10).
+
 ## 2026-11-25
 
 ### Feito
