@@ -9,8 +9,8 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def admin_client_logged(client: Client) -> Client:
-    superuser = User.objects.create_superuser("admin@example.com", "s3cret-pass")
+def admin_client_logged(client: Client, password: str) -> Client:
+    superuser = User.objects.create_superuser("admin@example.com", password)
     client.force_login(superuser)
     return client
 
@@ -19,8 +19,8 @@ def test_user_is_registered_with_custom_admin() -> None:
     assert isinstance(admin.site._registry[User], UserAdmin)  # noqa: SLF001 - no public API lists registered ModelAdmins
 
 
-def test_changelist_and_change_page_render(admin_client_logged: Client) -> None:
-    user = User.objects.create_user("ana@example.com", "s3cret-pass")
+def test_changelist_and_change_page_render(admin_client_logged: Client, password: str) -> None:
+    user = User.objects.create_user("ana@example.com", password)
 
     changelist = admin_client_logged.get("/admin/accounts/user/", {"q": "ana"})
     change = admin_client_logged.get(f"/admin/accounts/user/{user.pk}/change/")
@@ -30,24 +30,27 @@ def test_changelist_and_change_page_render(admin_client_logged: Client) -> None:
     assert change.status_code == 200
 
 
-def test_add_user_through_admin_normalizes_email(admin_client_logged: Client) -> None:
+def test_add_user_through_admin_normalizes_email(
+    admin_client_logged: Client, password: str
+) -> None:
     response = admin_client_logged.post(
         "/admin/accounts/user/add/",
-        {"email": "Bia@Example.com", "password1": "Xk9-long-pass", "password2": "Xk9-long-pass"},
+        {"email": "Bia@Example.com", "password1": password, "password2": password},
     )
 
     assert response.status_code == 302
-    assert User.objects.get(email="bia@example.com").check_password("Xk9-long-pass")
+    assert User.objects.get(email="bia@example.com").check_password(password)
 
 
 def test_add_user_through_admin_rejects_case_insensitive_duplicate(
     admin_client_logged: Client,
+    password: str,
 ) -> None:
-    User.objects.create_user("bia@example.com", "s3cret-pass")
+    User.objects.create_user("bia@example.com", password)
 
     response = admin_client_logged.post(
         "/admin/accounts/user/add/",
-        {"email": "BIA@example.com", "password1": "Xk9-long-pass", "password2": "Xk9-long-pass"},
+        {"email": "BIA@example.com", "password1": password, "password2": password},
     )
 
     assert response.status_code == 200
