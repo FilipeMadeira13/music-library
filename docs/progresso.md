@@ -20,11 +20,10 @@ Diário de sessões: o que foi feito, onde paramos e o que vem a seguir. A sess�
 - Nova auditoria das docs desde `main` (`ef407ad`): progresso, README, CHANGELOG, plano e índice de ADRs atualizados com a ADR 0009.
 
 ### Onde paramos
-Branch `feat/custom-user`, com `33d7955`, `3a098a1` e `2d13c8c`, **ainda sem push** (sem upstream). O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
-`Makefile`, `.env.example`, a ADR 0009 e as docs desta auditoria estão **no working tree, sem commit**.
+Branch `feat/custom-user`, com `33d7955`, `3a098a1`, `2d13c8c`, `2267323` (chore: `make run` com `DEBUG=true`) e `7d7d185` (docs: ADR 0009), além deste ajuste do diário. Tudo commitado; falta o push e o PR para `main`. O `db.sqlite3` local já tem `accounts.0001` e `0002` aplicadas.
 
 ### Próximos passos
-1. Commitar as mudanças pendentes (`chore:` para `Makefile` + `.env.example`, `docs:` para o resto), fazer push e abrir o PR de `feat/custom-user`; conferir que o CI passa no Postgres 16 (as restrições novas só foram testadas em SQLite).
+1. Fazer push, abrir o PR de `feat/custom-user` e mesclar; conferir que o CI passa no Postgres 16 (as restrições novas só foram testadas em SQLite).
 2. **Tarefa 4:** allauth com e-mail/senha. Conferir que o allauth não reintroduz e-mail com caixa mista (a normalização do `User.save()` cobre, mas vale um teste de cadastro com `Ana@…` seguido de `ana@…` → "e-mail já em uso").
 3. A partir da tarefa 9, testar localmente com Postgres via `DATABASE_URL` ou confiar no CI (ADR 0001).
 
