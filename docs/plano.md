@@ -78,7 +78,7 @@ UserAlbum  — o "álbum na minha biblioteca"
 
 StreamingLink
   id, user_album FK (cascade)
-  service  enum(tidal, spotify, apple_music, deezer, youtube_music, amazon_music, bandcamp, other)
+  service  enum(tidal, spotify, apple_music, deezer, youtube_music, amazon_music, bandcamp, qobuz, other)
   url      varchar(2000)   label varchar(80) null (só para "other")
   source   enum(musicbrainz, user)   created_at
   UNIQUE(user_album, service) WHERE service <> 'other'

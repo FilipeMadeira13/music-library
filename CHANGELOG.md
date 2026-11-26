@@ -11,8 +11,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 - `Makefile` com `make check` como gate único (ruff, mypy strict, `makemigrations --check`, pytest com cobertura ≥ 80%) e hook de pre-commit.
 - CI no GitHub Actions rodando `make check` contra Postgres 16.
 - Documentação: requisitos, plano técnico, ADRs 0001–0002, README e este changelog.
+- Model `User` próprio, com e-mail como login (sem `username`) e serviço de streaming preferido opcional; enum `Service` em `library/choices.py`.
 
 ### Changed
+- Qobuz entra na lista de serviços de streaming reconhecidos (ADR 0004).
 - Requisitos: a documentação da API é OpenAPI 3 com Swagger UI, gerada por `drf-spectacular`; a qualidade inclui mypy strict; o ambiente local é um venv, sem Docker; o fuso de exibição é `America/Fortaleza` (ADR 0003).
 
 ### Fixed
