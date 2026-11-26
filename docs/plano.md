@@ -3,7 +3,7 @@
 ## Context
 O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zero. Este plano traduz os requisitos em arquitetura, modelo de dados, contratos, estratégia de erros e uma sequência de commits pequenos.
 
-> **Status (2026-11-25):** as tarefas 1 e 2 foram entregues no commit `b85399a`. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito).
+> **Status (2026-11-25):** as tarefas 1 e 2 foram entregues no commit `b85399a` (correção em `16f5931`); a documentação foi sincronizada em `7cb4357`. A próxima é a tarefa 3. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito; ADR 0003: fuso `America/Fortaleza`). O diário de sessões fica em [progresso.md](progresso.md).
 
 ### Campos preenchidos (tirados do documento de requisitos)
 | Campo | Valor |
@@ -176,7 +176,7 @@ Rotas web: `/` (biblioteca), `/search`, `/albums/<id>`, `/random`, `/profile` e 
 |---|---|---|---|---|
 | 1 ✅ | Esqueleto do projeto: `pyproject.toml`, ruff + mypy strict, settings por env, `Makefile` (`make check`), pre-commit, `.env.example` (sem Docker, ver ADR 0001) | `pyproject.toml`, `config/settings.py`, `Makefile`, `.pre-commit-config.yaml`, `manage.py` | `make check` (1 smoke test) | `/healthz` responde 200 e `make check` passa |
 | 2 ✅ | CI no GitHub Actions: `make check` com `CI=true` e Postgres 16 como service (entregue no mesmo commit da tarefa 1) | `.github/workflows/ci.yml` | Abrir um PR | O pipeline fica verde |
-| 3 | `User` custom (e-mail como login, `preferred_service`) e primeira migração | `accounts/models.py`, `accounts/migrations/0001*` | Teste de criação de usuário | Migração aplicada, sem `username` |
+| 3 ⏭️ | `User` custom (e-mail como login, `preferred_service`) e primeira migração | `accounts/models.py`, `accounts/migrations/0001*` | Teste de criação de usuário | Migração aplicada, sem `username` |
 | 4 | allauth com e-mail/senha: cadastro, login, logout e templates básicos em PT com `gettext` | `config/settings.py`, `accounts/templates/…` | Testes de integração: cadastro feliz, e-mail duplicado, erros por campo, credencial errada com mensagem genérica | Os critérios de US01 de e-mail passam |
 | 5 | Rate limit de login (429) e `LOGIN_REQUIRED` nas rotas da biblioteca, com `next=` | settings, `core/middleware.py` (HX-Redirect) | Teste com 6 tentativas resultando em 429; acesso anônimo redireciona; requisição HTMX anônima recebe `HX-Redirect` | Força bruta, sem autenticação e sessão expirada passam |
 | 6 | Redefinir senha: timeout de 1 h, mensagem neutra, rate limit 3/h, falha de e-mail só no log | settings, templates | Testes com `mail.outbox`, token usado ou expirado, e-mail inexistente, backend que lança exceção | US02 completa |

@@ -3,6 +3,7 @@
 Personal music library (Django 5.2 + DRF + HTMX, PostgreSQL) backed by MusicBrainz.
 Requirements: [docs/requisitos.md](docs/requisitos.md). Architecture, data model and task order: [docs/plano.md](docs/plano.md).
 Decisions that deviate from or extend the plan: [docs/decisoes/](docs/decisoes/). Notable changes: [CHANGELOG.md](CHANGELOG.md).
+Session log (done, where we stopped, next steps, open questions): [docs/progresso.md](docs/progresso.md). Read it at the start of a session and update it at the end.
 
 ## Commands
 | Command | What it does |

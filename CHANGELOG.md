@@ -13,7 +13,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 - Documentação: requisitos, plano técnico, ADRs 0001–0002, README e este changelog.
 
 ### Changed
-- Requisitos: a documentação da API é OpenAPI 3 com Swagger UI, gerada por `drf-spectacular`; a qualidade inclui mypy strict; o ambiente local é um venv, sem Docker.
+- Requisitos: a documentação da API é OpenAPI 3 com Swagger UI, gerada por `drf-spectacular`; a qualidade inclui mypy strict; o ambiente local é um venv, sem Docker; o fuso de exibição é `America/Fortaleza` (ADR 0003).
 
 ### Fixed
 - `manage.py` passa a ser commitado como executável, o que corrige o ruff EXE001 no CI (`16f5931`).

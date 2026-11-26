@@ -9,3 +9,4 @@ Formato: um arquivo `NNNN-titulo-curto.md` com as seções Status, Contexto, Dec
 |---|---|---|---|
 | [0001](0001-ambiente-local-sem-docker.md) | Ambiente local sem Docker | Aceita | 2026-11-22 |
 | [0002](0002-gate-de-qualidade-estrito.md) | Gate de qualidade estrito (`make check`) | Aceita | 2026-11-22 |
+| [0003](0003-fuso-horario-fortaleza.md) | Fuso horário de exibição `America/Fortaleza` | Aceita | 2026-11-25 |
