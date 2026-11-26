@@ -15,3 +15,4 @@ Formato: um arquivo `NNNN-titulo-curto.md` com as seções Status, Contexto, Dec
 | [0006](0006-email-sem-distincao-de-caixa.md) | E-mail sem distinção de maiúsculas e restrições do `User` no banco | Aceita | 2026-11-26 |
 | [0007](0007-genericos-dos-stubs-sob-type-checking.md) | Genéricos do `django-stubs` só sob `TYPE_CHECKING` | Aceita | 2026-11-26 |
 | [0008](0008-commits-por-tarefa.md) | Um commit `feat:` por tarefa, com `fix:`/`docs:` à parte | Aceita | 2026-11-26 |
+| [0009](0009-make-run-com-debug.md) | `make run` sobe com `DEBUG=true` por padrão | Aceita | 2026-11-26 |

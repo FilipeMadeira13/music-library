@@ -13,7 +13,7 @@ Session log (done, where we stopped, next steps, open questions): [docs/progress
 | `make fmt` | Applies `ruff format` and `ruff check --fix` |
 | `make lint` / `make types` / `make test` | Run each step on its own |
 | `.venv/bin/pytest tests/test_smoke.py -k healthz` | Run a single test (coverage threshold applies; add `--no-cov` for quick runs) |
-| `make run` | `manage.py runserver` |
+| `make run` | `manage.py runserver` with `DEBUG=true` unless `DEBUG` is already set (needed for admin static files) |
 | `.venv/bin/python manage.py migrate` | Apply migrations (SQLite by default) |
 
 Settings read real environment variables only; nothing loads `.env` (export the vars from `.env.example` yourself).

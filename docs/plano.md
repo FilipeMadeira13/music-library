@@ -3,7 +3,7 @@
 ## Context
 O repositório tem só [requisitos.md](requisitos.md) e o projeto começa do zero. Este plano traduz os requisitos em arquitetura, modelo de dados, contratos, estratégia de erros e uma sequência de commits pequenos.
 
-> **Status (2026-11-26):** as tarefas 1 e 2 foram entregues no commit `b85399a` (correção em `16f5931`) e a tarefa 3 em `33d7955` (revisão em `3a098a1`). A próxima é a tarefa 4. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito; ADR 0003: fuso `America/Fortaleza`; ADR 0004: Qobuz; ADR 0005: enum `Service` em `library/choices.py`; ADR 0006: e-mail sem distinção de caixa; ADR 0007: genéricos dos stubs sob `TYPE_CHECKING`; ADR 0008: commits por tarefa). O diário de sessões fica em [progresso.md](progresso.md).
+> **Status (2026-11-26):** as tarefas 1 e 2 foram entregues no commit `b85399a` (correção em `16f5931`) e a tarefa 3 em `33d7955` (revisão em `3a098a1`). A próxima é a tarefa 4. Os desvios em relação a este plano estão registrados em [decisoes/](decisoes/) (ADR 0001: ambiente local sem Docker; ADR 0002: gate de qualidade estrito; ADR 0003: fuso `America/Fortaleza`; ADR 0004: Qobuz; ADR 0005: enum `Service` em `library/choices.py`; ADR 0006: e-mail sem distinção de caixa; ADR 0007: genéricos dos stubs sob `TYPE_CHECKING`; ADR 0008: commits por tarefa; ADR 0009: `make run` com `DEBUG=true`). O diário de sessões fica em [progresso.md](progresso.md).
 
 ### Campos preenchidos (tirados do documento de requisitos)
 | Campo | Valor |
